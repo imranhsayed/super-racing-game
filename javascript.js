@@ -2,13 +2,17 @@ var Game = ( function ( $ ) {
 	"use strict";
 	var game = {};
 
+		/**
+		 * Init Function
+		 */
 		game.init = function () {
 			game.config();
-			game.createRoadBox();
-			game.createRoadLines( 5 );
-			game.ScreenSetUp( 'game-start-level-one', 'Start', 'home-screen-background' );
+			game.screenSetUp( 'game-start-level-one', 'Start', 'home-screen-background' );
 		};
 
+		/**
+		 * Game Configuration
+		 */
 		game.config = function () {
 
 			// Declaring the variables globally and assigning them values.
@@ -30,7 +34,9 @@ var Game = ( function ( $ ) {
 		 * @param bodyBackgroundClass
 		 * @constructor
 		 */
-		game.ScreenSetUp = function ( startBtnClassName, btnName, bodyBackgroundClass ) {
+		game.screenSetUp = function ( startBtnClassName, btnName, bodyBackgroundClass ) {
+			game.createRoadBox();
+			game.createRoadLines( 10 );
 			game.startBttn = game.createElement( 'button', 'class', startBtnClassName );
 			game.startBttn.textContent = btnName;
 			game.body.appendChild( game.startBttn );
@@ -56,12 +62,16 @@ var Game = ( function ( $ ) {
 		 */
 		game.gameStart = function () {
 			var carImage;
-				game.body.classList.remove( 'home-screen-background' );
-				game.body.removeChild( game.startBttn );
-				carImage = game.createAndDisplayCar();
-				document.querySelector( '.road-box' ).style.display = 'block';
-				game.moveRoadLineContainerLeft();
-				game.createAndDisplayDirectionBtn( carImage );
+
+			game.body.classList.remove( 'home-screen-background' );
+			game.body.removeChild( game.startBttn );
+			carImage = game.createAndDisplayCar();
+			document.querySelector( '.road-box' ).style.display = 'block';
+			game.setRoadLineContainerLeft();
+			game.createAndDisplayDirectionBtn( carImage );
+			game.createAndDisplayMotionBtn();
+			game.accelerateBtn = document.querySelector( '.accelerate-img' );
+			game.accelerateBtn.addEventListener( 'click', game.moveRoad );
 		};
 
 		/**
@@ -81,17 +91,19 @@ var Game = ( function ( $ ) {
 
 		/**
 		 * Creates Road Box Divs on the left and right of the divider.
+		 *
+		 * @param {string} containerClassName Class name of the container div.
 		 */
-		game.createRoadBox = function () {
-			var roadBoxDiv = game.createElement( 'div', 'class', 'road-box' );
-				game.body.insertBefore( roadBoxDiv, game.hiddenElement );
-				roadBoxDiv.style.minWidth = game.windowWidth + 'px';
-				roadBoxDiv.style.minHeight = game.windowHeight + 'px';
-				document.querySelector( '.road-box' ).appendChild( game.roadLineContainer );
-				game.roadLineContainerLeft.style.minWidth = ( game.windowWidth / 2 ) + 'px';
-				game.roadLineContainerLeft.style.minHeight = ( game.windowHeight ) + 'px';
-				game.roadLineContainerRight.style.minWidth = ( game.windowWidth / 2.4 ) + 'px';
-				game.roadLineContainerRight.style.minHeight = ( game.windowHeight ) + 'px';
+		game.createRoadBox = function ( containerClassName ) {
+			game.roadBoxDiv = game.createElement( 'div', 'class', 'road-box' );
+			game.body.insertBefore( game.roadBoxDiv, game.hiddenElement );
+			game.roadBoxDiv.style.minWidth = game.windowWidth + 'px';
+			game.roadBoxDiv.style.minHeight = game.windowHeight + 'px';
+			document.querySelector( '.road-box' ).appendChild( game.roadLineContainer );
+			game.roadLineContainerLeft.style.minWidth = ( game.windowWidth / 2 ) + 'px';
+			game.roadLineContainerLeft.style.minHeight = ( game.windowHeight ) + 'px';
+			game.roadLineContainerRight.style.minWidth = ( game.windowWidth / 2.4 ) + 'px';
+			game.roadLineContainerRight.style.minHeight = ( game.windowHeight ) + 'px';
 
 			console.log( game.windowWidth );
 			console.log( game.windowHeight );
@@ -135,7 +147,7 @@ var Game = ( function ( $ ) {
 		/**
 		 * Set the road line container to left.
 		 */
-		game.moveRoadLineContainerLeft = function () {
+		game.setRoadLineContainerLeft = function () {
 			game.roadLineContainer.setAttribute( 'position', 'relative' );
 			game.roadLineContainerLeft.setAttribute( 'position', 'absolute' );
 		};
@@ -170,6 +182,18 @@ var Game = ( function ( $ ) {
 		};
 
 		/**
+		 * Create and Display Motion Buttons Stop and Accelerate Buttons
+		 */
+		game.createAndDisplayMotionBtn = function () {
+			var stopBtn = game.createElement( 'img', 'class', 'stop-acceleration-img' ),
+				accelerateBtn = game.createElement( 'img', 'class', 'accelerate-img' );
+			stopBtn.setAttribute( 'src', 'images/stop-button.png' );
+			accelerateBtn.setAttribute( 'src', 'images/accelerate.png' );
+			game.body.appendChild( stopBtn );
+			game.body.appendChild( accelerateBtn );
+		};
+
+		/**
 		 * Changes car position from left to right and vice versa.
 		 *
 		 * @param leftDirectionBtn
@@ -189,6 +213,60 @@ var Game = ( function ( $ ) {
 				currentPos = Math.round( ( carLeftPos / game.windowWidth ) * 100 );
 				game.animate( carImage, 5, currentPos, 67, '%', 'left' );
 			} );
+
+			/**
+			 *  Allowing window arrow to control the direction
+			 * @todo remove this line of code after testing.
+			 */
+			game.body.addEventListener( 'keydown', function ( event ) {
+				if ( 37 === event.which ) {
+					console.log( 'leftarrow pressed' );
+					leftDirectionBtn.click();
+				}
+				if ( 39 === event.which ) {
+					console.log( 'rightarrow key pressed' );
+					rightDirectionBtn.click();
+				}
+				if ( 32 === event.which ) {
+					console.log( 'spacebar pressed' );
+					game.accelerateBtn.click();
+				}
+			} );
+		};
+
+		/**
+		 * Sets the Road in Motion and then removes the event listener.
+		 */
+		game.moveRoad = function () {
+			game.animateRoad( game.roadBoxDiv, 1, 3, -game.windowHeight, 0, 'px' );
+			game.accelerateBtn.removeEventListener( 'click', game.moveRoad );
+		};
+
+		/**
+		 * Custom function to animate road setting it to infinite loop.
+		 *
+		 * @param element
+		 * @param timeInSec
+		 * @param speed
+		 * @param startPos
+		 * @param endPos
+		 * @param unit
+	 */
+		game.animateRoad = function ( element, timeInSec, speed, startPos, endPos, unit ) {
+			var pos = startPos,
+				interval = setInterval( frameFunc, timeInSec );
+			function frameFunc() {
+				if ( endPos === pos ) {
+					clearInterval( interval );
+				} else {
+
+					pos = ( endPos > pos ) ? pos + speed : pos - speed;
+					if ( endPos === pos ) {
+						pos = startPos;
+					}
+					element.style.top = pos + unit;
+				}
+			}
 		};
 
 		/**
