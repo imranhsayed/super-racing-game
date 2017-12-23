@@ -71,7 +71,10 @@ var Game = ( function ( $ ) {
 			game.createAndDisplayDirectionBtn( carImage );
 			game.createAndDisplayMotionBtn();
 			game.accelerateBtn = document.querySelector( '.accelerate-img' );
+			game.stopAccelerationBtn = document.querySelector( '.stop-acceleration-img' );
+			game.roadBoxDiv.style.top = -game.windowHeight + 'px';
 			game.accelerateBtn.addEventListener( 'click', game.moveRoad );
+			game.stopAccelerationBtn.addEventListener( 'click', game.stopRoad );
 		};
 
 		/**
@@ -238,46 +241,90 @@ var Game = ( function ( $ ) {
 		 * Sets the Road in Motion and then removes the event listener.
 		 */
 		game.moveRoad = function () {
-			game.animateRoad( game.roadBoxDiv, 1, 3, -game.windowHeight, 0, 'px' );
+			var roadCurrentPosition = parseFloat( game.roadBoxDiv.style.top );
+			console.log( 'Current Start pos =' + roadCurrentPosition );
+			game.startRoadAnimation( game.roadBoxDiv, 1, 1, roadCurrentPosition, 0, 'px' );
 			game.accelerateBtn.removeEventListener( 'click', game.moveRoad );
+			game.stopAccelerationBtn.addEventListener( 'click', game.stopRoad );
+		};
+
+		/**
+		 * Stops Road movement
+		 */
+		game.stopRoad = function () {
+			clearInterval( game.startRoadInterval );
+			var roadCurrentPos = parseFloat( game.roadBoxDiv.style.top );
+			game.stopRoadAnimation( game.roadBoxDiv, 1, 1, roadCurrentPos, game.windowHeight, 'px' );
+			game.roadBoxDiv.style.top = -game.windowHeight + 'px';
+			console.log( 'stop road anima' );
+			game.stopAccelerationBtn.removeEventListener( 'click', game.stopRoad );
+			game.accelerateBtn.addEventListener( 'click', game.moveRoad );
 		};
 
 		/**
 		 * Custom function to animate road setting it to infinite loop.
 		 *
-		 * @param element
-		 * @param timeInSec
-		 * @param speed
-		 * @param startPos
-		 * @param endPos
-		 * @param unit
+		 * @param {string} element
+		 * @param {int} timeInSec
+		 * @param {int} speed Range 1-5 Controls the speed.
+		 * @param {int} startPos
+		 * @param {int} endPos
+		 * @param {string} unit px or %.
 	 */
-		game.animateRoad = function ( element, timeInSec, speed, startPos, endPos, unit ) {
-			var pos = startPos,
-				interval = setInterval( frameFunc, timeInSec );
-			function frameFunc() {
-				if ( endPos === pos ) {
-					clearInterval( interval );
-				} else {
+		game.startRoadAnimation = function ( element, timeInSec, speed, startPos, endPos, unit ) {
+			clearInterval( game.stopRoadInterval );
+			var pos = startPos;
+				game.startRoadInterval = setInterval( frameStartFunc, timeInSec );
 
+			function frameStartFunc() {
+				if ( endPos === pos ) {
+					clearInterval( game.startRoadInterval );
+				} else {
 					pos = ( endPos > pos ) ? pos + speed : pos - speed;
-					if ( endPos === pos ) {
-						pos = startPos;
+					if ( endPos <= pos || 0 === pos ) {
+						pos = -window.innerHeight;
 					}
 					element.style.top = pos + unit;
+					console.log( pos );
+				}
+			};
+		};
+
+		/**
+		 * Custom function to stop road animation and bring the road motion to rest.
+		 *
+		 * @param {string} element
+		 * @param {int} timeInSec
+		 * @param {int} speed Range 1-5 Controls the speed.
+		 * @param {int} startPos
+		 * @param {int} endPos
+		 * @param {string} unit px or %.
+		 */
+		game.stopRoadAnimation = function ( element, timeInSec, speed, startPos, endPos, unit ) {
+			var pos = startPos,
+				targetEndPos = -game.windowHeight + 'px';
+				game.stopRoadInterval = setInterval( frameStopFunc, timeInSec );
+
+			function frameStopFunc() {
+				if ( ( startPos + 100 ) === pos ) {
+					clearInterval( game.stopRoadInterval );
+				} else {
+					pos = ( endPos > pos ) ? pos + speed : pos - speed;
+					element.style.top = pos + unit;
+					console.log( pos );
 				}
 			}
-		};
+		}
 
 		/**
 		 * Animates an element from position 0 to
 		 *
-		 * @param element
-		 * @param timeInSec
-		 * @param startPos
-		 * @param endPos
-		 * @param unit px or %.
-		 * @param direction left, right, top or bottom
+		 * @param {string} element
+		 * @param {int} timeInSec
+		 * @param {int} startPos
+		 * @param {int} endPos
+		 * @param {string} unit px or %.
+		 * @param {string} direction left, right, top or bottom
 		 */
 		game.animate = function ( element, timeInSec, startPos, endPos, unit, direction ) {
 			var pos = startPos,

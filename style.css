@@ -78,12 +78,12 @@ body {
 
 .road-lines-left {
 	border-right: 8px solid #ffffff;
-	/*background: red;*/
+	background: red;
 	margin-top: 20%;
 }
 
 .road-lines-right {
-	/*background: blue;*/
+	background: blue;
 	margin-top: 20%;
 }
 
