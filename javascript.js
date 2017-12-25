@@ -43,6 +43,21 @@ var Game = ( function ( $ ) {
 			game.startBtnAlignCenter( game.startBttn );
 			game.body.classList.add( bodyBackgroundClass );
 			game.startBttn.addEventListener( 'click', game.gameStart );
+
+			/**
+			 * Start the game on pressing enter key on computer
+			 * 
+			 * @todo remove this on release
+			 */
+			game.body.addEventListener( 'keydown', function ( event ) {
+				if ( 13 === event.which ) {
+					game.startBttn.click();
+				}
+				if ( 83 === event.which ) {
+					game.stopAccelerationBtn.click();
+				}
+
+			} );
 		};
 
 		/**
@@ -69,11 +84,11 @@ var Game = ( function ( $ ) {
 			document.querySelector( '.road-box' ).style.display = 'block';
 			game.setRoadLineContainerLeft();
 			game.createAndDisplayDirectionBtn( carImage );
+			game.createAndDisplayGearBtn();
 			game.createAndDisplayMotionBtn();
 			game.accelerateBtn = document.querySelector( '.accelerate-img' );
 			game.stopAccelerationBtn = document.querySelector( '.stop-acceleration-img' );
 			game.roadBoxDiv.style.top = -game.windowHeight + 'px';
-			game.accelerateBtn.addEventListener( 'click', game.moveRoad );
 			game.stopAccelerationBtn.addEventListener( 'click', game.stopRoad );
 		};
 
@@ -189,11 +204,41 @@ var Game = ( function ( $ ) {
 		 */
 		game.createAndDisplayMotionBtn = function () {
 			var stopBtn = game.createElement( 'img', 'class', 'stop-acceleration-img' ),
-				accelerateBtn = game.createElement( 'img', 'class', 'accelerate-img' );
+				accelerateBtn = game.createElement( 'div', 'class', 'gear-control-container' );
 			stopBtn.setAttribute( 'src', 'images/stop-button.png' );
 			accelerateBtn.setAttribute( 'src', 'images/accelerate.png' );
 			game.body.appendChild( stopBtn );
 			game.body.appendChild( accelerateBtn );
+		};
+
+		/**
+		 * Create and Display Gear Control Button.
+		 */
+		game.createAndDisplayGearBtn = function () {
+			var gearBtn = game.createElement( 'div', 'class', 'gear-btn' );
+			game.gearNumber = 0;
+			game.reduceGear = false;
+			gearBtn.textContent = '' + game.gearNumber + '';
+
+			gearBtn.addEventListener( 'click', function () {
+				if ( ( game.gearNumber >= 5 || true === game.reduceGear ) && 0 !== game.gearNumber ) {
+					game.reduceGear = true;
+					game.stopRoad();
+					game.gearNumber--;
+					gearBtn.textContent = '' + game.gearNumber + '';
+					console.log( game.gearNumber );
+					game.moveRoad();
+				} else if ( game.gearNumber < 5 ) {
+					game.reduceGear = false;
+					game.stopRoad();
+					game.gearNumber++;
+					gearBtn.textContent = '' + game.gearNumber + '';
+					console.log( game.gearNumber );
+					game.moveRoad();
+				}
+			} );
+
+			game.body.appendChild( gearBtn );
 		};
 
 		/**
@@ -223,15 +268,12 @@ var Game = ( function ( $ ) {
 			 */
 			game.body.addEventListener( 'keydown', function ( event ) {
 				if ( 37 === event.which ) {
-					console.log( 'leftarrow pressed' );
 					leftDirectionBtn.click();
 				}
 				if ( 39 === event.which ) {
-					console.log( 'rightarrow key pressed' );
 					rightDirectionBtn.click();
 				}
 				if ( 32 === event.which ) {
-					console.log( 'spacebar pressed' );
 					game.accelerateBtn.click();
 				}
 			} );
@@ -242,8 +284,7 @@ var Game = ( function ( $ ) {
 		 */
 		game.moveRoad = function () {
 			var roadCurrentPosition = parseFloat( game.roadBoxDiv.style.top );
-			console.log( 'Current Start pos =' + roadCurrentPosition );
-			game.startRoadAnimation( game.roadBoxDiv, 1, 1, roadCurrentPosition, 0, 'px' );
+			game.startRoadAnimation( game.roadBoxDiv, 1, game.gearNumber, roadCurrentPosition, 0, 'px' );
 			game.accelerateBtn.removeEventListener( 'click', game.moveRoad );
 			game.stopAccelerationBtn.addEventListener( 'click', game.stopRoad );
 		};
@@ -256,9 +297,7 @@ var Game = ( function ( $ ) {
 			var roadCurrentPos = parseFloat( game.roadBoxDiv.style.top );
 			game.stopRoadAnimation( game.roadBoxDiv, 1, 1, roadCurrentPos, game.windowHeight, 'px' );
 			game.roadBoxDiv.style.top = -game.windowHeight + 'px';
-			console.log( 'stop road anima' );
 			game.stopAccelerationBtn.removeEventListener( 'click', game.stopRoad );
-			game.accelerateBtn.addEventListener( 'click', game.moveRoad );
 		};
 
 		/**
@@ -285,7 +324,6 @@ var Game = ( function ( $ ) {
 						pos = -window.innerHeight;
 					}
 					element.style.top = pos + unit;
-					console.log( pos );
 				}
 			};
 		};
@@ -311,7 +349,6 @@ var Game = ( function ( $ ) {
 				} else {
 					pos = ( endPos > pos ) ? pos + speed : pos - speed;
 					element.style.top = pos + unit;
-					console.log( pos );
 				}
 			}
 		}
@@ -329,6 +366,7 @@ var Game = ( function ( $ ) {
 		game.animate = function ( element, timeInSec, startPos, endPos, unit, direction ) {
 			var pos = startPos,
 				interval = setInterval( frameFunc, timeInSec );
+
 			function frameFunc() {
 				if ( endPos === pos ) {
 					clearInterval( interval );

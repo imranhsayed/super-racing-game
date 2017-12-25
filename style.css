@@ -78,12 +78,12 @@ body {
 
 .road-lines-left {
 	border-right: 8px solid #ffffff;
-	background: red;
+	/*background: red;*/
 	margin-top: 20%;
 }
 
 .road-lines-right {
-	background: blue;
+	/*background: blue;*/
 	margin-top: 20%;
 }
 
@@ -145,7 +145,7 @@ body {
 	margin-right: 5%;
 }
 
-/* Motion controls Stop button and Acceleration Button */
+/* Motion controls Stop button, Gear Button and Acceleration Button */
 
 .stop-acceleration-img, .accelerate-img {
 	position: fixed;
@@ -155,8 +155,21 @@ body {
 	float: right;
 }
 
+.gear-btn {
+	position: fixed;
+	bottom: 4%;
+	font-size: 1.5em;
+	padding: 5%;
+	height: 9%;
+	color: #b7dbf7;
+	background: rgba( 0, 0, 0, 0.5 );
+	border-radius: 50%;
+	left: 46%;
+}
+
 .stop-acceleration-img {
 	bottom: 11%;
 }
+
 
 
