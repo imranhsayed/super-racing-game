@@ -60,8 +60,6 @@ html {
 
 body {
 	overflow: hidden;
-	border-left: 10px solid #B29500;
-	border-right: 10px solid #B29500;
 	background: #7A7A78;
 	position: relative;
 }
@@ -78,12 +76,12 @@ body {
 
 .road-lines-left {
 	border-right: 8px solid #ffffff;
-	/*background: red;*/
+	background: red;
 	margin-top: 20%;
 }
 
 .road-lines-right {
-	/*background: blue;*/
+	background: blue;
 	margin-top: 20%;
 }
 
@@ -128,32 +126,8 @@ body {
 	display: inline-block;
 }
 
-/* Direction Button Container and Images */
-.direction-button-container {
-	position: fixed;
-	bottom: 5%;
-	left: 6%;
-	display: inline;
-}
 
-.direction-button-container img {
-	display: inline-block;
-	width: 10%;
-}
-
-.left-direction-button {
-	margin-right: 5%;
-}
-
-/* Motion controls Stop button, Gear Button and Acceleration Button */
-
-.stop-acceleration-img, .accelerate-img {
-	position: fixed;
-	bottom: 4%;
-	right: 5%;
-	width: 25%;
-	float: right;
-}
+/* Motion controls Stop button, Gear Button, Gear Up, Gear Down, Direction Up, Direction Down Arrow Keys */
 
 .gear-btn {
 	position: fixed;
@@ -167,8 +141,54 @@ body {
 	left: 46%;
 }
 
-.stop-acceleration-img {
-	bottom: 11%;
+.gear-control-container {
+	display: inline;
+	position: fixed;
+	right: 3%;
+	bottom: 4%;
+}
+
+.gear-control-container img {
+	display: block;
+	width: 3.5em;
+	text-align: center;
+	margin: 0 auto;
+}
+
+.gear-down-arrow {
+	margin-left: 0.10em;
+}
+
+.gear-control-container .left-direction-button, .gear-control-container .right-direction-button {
+	display: inline;
+	width: 2em;
+}
+
+.gear-control-container .stop-acceleration-img {
+	display: inline;
+	margin: 0.25em;
+}
+
+.clear {
+	clear: both;
+}
+
+/* Game Info Container */
+.game-info-container {
+	position: fixed;
+	text-align: center;
+	width: 100%;
+	color: white;
+}
+
+.game-info-container p {
+	padding-bottom: 0.25em;
+	text-shadow: 1px 2px #000000;
+	letter-spacing: 1px;
+}
+
+.score-label {
+	padding-top: 0.5em;
 }
 
 

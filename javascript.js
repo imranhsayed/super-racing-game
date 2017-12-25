@@ -24,6 +24,9 @@ var Game = ( function ( $ ) {
 			game.roadLineContainer = game.createElement( 'div', 'class', 'road-line-container' );
 			game.roadLineContainerLeft = game.createElement( 'div', 'class', 'road-line-container-left' );
 			game.roadLineContainerRight = game.createElement( 'div', 'class', 'road-line-container-right' );
+			game.score = 0;
+			game.carWasStopped = false;
+			game.gameOver = false;
 		};
 
 		/**
@@ -78,18 +81,24 @@ var Game = ( function ( $ ) {
 		game.gameStart = function () {
 			var carImage;
 
+			console.log( 'height = ' + game.roadLineContainer.offsetHeight );
 			game.body.classList.remove( 'home-screen-background' );
 			game.body.removeChild( game.startBttn );
 			carImage = game.createAndDisplayCar();
 			document.querySelector( '.road-box' ).style.display = 'block';
+			game.createGameInfoBox();
 			game.setRoadLineContainerLeft();
-			game.createAndDisplayDirectionBtn( carImage );
-			game.createAndDisplayGearBtn();
-			game.createAndDisplayMotionBtn();
-			game.accelerateBtn = document.querySelector( '.accelerate-img' );
+			game.createAndDisplayMotionBtn( carImage );
+			game.createAndDisplayGearControls();
 			game.stopAccelerationBtn = document.querySelector( '.stop-acceleration-img' );
 			game.roadBoxDiv.style.top = -game.windowHeight + 'px';
-			game.stopAccelerationBtn.addEventListener( 'click', game.stopRoad );
+			game.stopAccelerationBtn.addEventListener( 'click', function () {
+				game.gearNumber = 0;
+				game.gearCountText.textContent = '' + game.gearNumber + '';
+				game.journeyPoint = parseFloat( game.roadBoxDiv.style.top );
+				game.carWasStopped = true;
+				game.stopRoad();
+			} );
 		};
 
 		/**
@@ -183,62 +192,104 @@ var Game = ( function ( $ ) {
 		};
 
 		/**
-		 * Create and Display direction button.
+		 * Create and Display Motion Buttons : Gear Up, Right Direction, Left Direction, Gear Down, Stop Button.
 		 *
 		 * @param carImage
 		 */
-		game.createAndDisplayDirectionBtn = function ( carImage ) {
-			var leftDirectionBtn = game.createElement( 'img', 'class', 'left-direction-button' ),
-				rightDirectionBtn = game.createElement( 'img', 'class', 'right-direction-button' ),
-				directionBtnContainer = game.createElement( 'div', 'class', 'direction-button-container' );
-			leftDirectionBtn.setAttribute( 'src', 'images/left-arrow.png' );
-			rightDirectionBtn.setAttribute( 'src', 'images/right-arrow.png' );
-			directionBtnContainer.appendChild( leftDirectionBtn );
-			directionBtnContainer.appendChild( rightDirectionBtn );
-			game.body.appendChild( directionBtnContainer );
-			game.changeCarPos( leftDirectionBtn, rightDirectionBtn, carImage );
-		};
-
-		/**
-		 * Create and Display Motion Buttons Stop and Accelerate Buttons
-		 */
-		game.createAndDisplayMotionBtn = function () {
+			game.createAndDisplayMotionBtn = function ( carImage ) {
 			var stopBtn = game.createElement( 'img', 'class', 'stop-acceleration-img' ),
-				accelerateBtn = game.createElement( 'div', 'class', 'gear-control-container' );
-			stopBtn.setAttribute( 'src', 'images/stop-button.png' );
-			accelerateBtn.setAttribute( 'src', 'images/accelerate.png' );
-			game.body.appendChild( stopBtn );
-			game.body.appendChild( accelerateBtn );
+				gearControlContainer = game.createElement( 'div', 'class', 'gear-control-container' ),
+				leftDirectionBtn = game.createElement( 'img', 'class', 'left-direction-button' ),
+				rightDirectionBtn = game.createElement( 'img', 'class', 'right-direction-button' );
+
+				game.upArrowBtn = game.createElement( 'img', 'class', 'gear-up-arrow' );
+				game.downArrowBtn = game.createElement( 'img', 'class', 'gear-down-arrow' );
+
+			stopBtn.setAttribute( 'src', 'images/stops-button.png' );
+			game.upArrowBtn.setAttribute( 'src', 'images/up-arrow.png' );
+			rightDirectionBtn.setAttribute( 'src', 'images/right-arrow.png' );
+			game.downArrowBtn.setAttribute( 'src', 'images/down-arrow.png' );
+			leftDirectionBtn.setAttribute( 'src', 'images/left-arrow.png' );
+
+			gearControlContainer.appendChild( game.upArrowBtn );
+			gearControlContainer.appendChild( leftDirectionBtn );
+			gearControlContainer.appendChild( stopBtn );
+			gearControlContainer.appendChild( rightDirectionBtn );
+			gearControlContainer.appendChild( game.downArrowBtn );
+			game.body.appendChild( gearControlContainer );
+			game.clearFloatEl = game.createElement( 'div', 'class', 'clear' );
+			gearControlContainer.appendChild( game.clearFloatEl );
+			game.changeCarPos( leftDirectionBtn, rightDirectionBtn, carImage );
+
 		};
 
 		/**
 		 * Create and Display Gear Control Button.
+		 * And Set Event Handlers to change the gears and control the speed.
 		 */
-		game.createAndDisplayGearBtn = function () {
-			var gearBtn = game.createElement( 'div', 'class', 'gear-btn' );
+		game.createAndDisplayGearControls = function () {
 			game.gearNumber = 0;
 			game.reduceGear = false;
-			gearBtn.textContent = '' + game.gearNumber + '';
+			game.gearCountText.textContent = '' + game.gearNumber + '';
 
-			gearBtn.addEventListener( 'click', function () {
-				if ( ( game.gearNumber >= 5 || true === game.reduceGear ) && 0 !== game.gearNumber ) {
-					game.reduceGear = true;
-					game.stopRoad();
-					game.gearNumber--;
-					gearBtn.textContent = '' + game.gearNumber + '';
-					console.log( game.gearNumber );
-					game.moveRoad();
-				} else if ( game.gearNumber < 5 ) {
-					game.reduceGear = false;
-					game.stopRoad();
-					game.gearNumber++;
-					gearBtn.textContent = '' + game.gearNumber + '';
-					console.log( game.gearNumber );
-					game.moveRoad();
-				}
-			} );
+			game.upArrowBtn.addEventListener( 'click', game.increaseGear );
+			game.downArrowBtn.addEventListener( 'click', game.decreaseGear );
 
-			game.body.appendChild( gearBtn );
+			// game.body.appendChild( game.gearBtn );
+		};
+
+		/**
+		 * Increases the gear number.
+		 */
+		game.increaseGear = function () {
+			if ( 5 <= game.gearNumber || true === game.gameOver ) {
+				return;
+			}
+			game.carWasStopped = true;
+			game.journeyPoint = parseFloat( game.roadBoxDiv.style.top );
+			game.reduceGear = false;
+			game.stopRoad();
+			game.gearNumber++;
+			game.gearCountText.textContent = '' + game.gearNumber + '';
+			game.moveRoad();
+			console.log( 'increase' );
+		};
+
+		/**
+		 * Decreases the gear number.
+		 */
+		game.decreaseGear = function () {
+			if ( 1 >= game.gearNumber || true === game.gameOver ) {
+				return;
+			}
+			console.log( 'decrease' );
+			game.carWasStopped = true;
+			game.journeyPoint = parseFloat( game.roadBoxDiv.style.top );
+			game.reduceGear = true;
+			game.stopRoad();
+			game.gearNumber--;
+			game.gearCountText.textContent = '' + game.gearNumber + '';
+			game.moveRoad();
+		};
+
+		/**
+		 * Creates and Displays the Game info at the top like Current Score and Gear Number.
+		 */
+		game.createGameInfoBox = function () {
+			var scoreLabel = game.createElement( 'p', 'class', 'score-label' ),
+				gearCountLabel = game.createElement( 'p', 'class', 'gear-count-label' );
+			game.scoreTextContainer = game.createElement( 'p', 'class', 'score-text-container' );
+
+			game.gearCountText = game.createElement( 'p', 'class', 'gear-count-text' );
+			scoreLabel.textContent = 'Score';
+			gearCountLabel.textContent = 'Gear';
+			game.gameInfoContainer = game.createElement( 'div', 'class', 'game-info-container' );
+			game.gameInfoContainer.appendChild( scoreLabel );
+			game.gameInfoContainer.appendChild( game.scoreTextContainer );
+			game.gameInfoContainer.appendChild( gearCountLabel );
+			game.gameInfoContainer.appendChild( game.gearCountText );
+
+			game.body.appendChild( game.gameInfoContainer );
 		};
 
 		/**
@@ -276,6 +327,12 @@ var Game = ( function ( $ ) {
 				if ( 32 === event.which ) {
 					game.accelerateBtn.click();
 				}
+				if ( 38 === event.which ) {
+					game.upArrowBtn.click();
+				}
+				if ( 40 === event.which ) {
+					game.downArrowBtn.click();
+				}
 			} );
 		};
 
@@ -285,7 +342,6 @@ var Game = ( function ( $ ) {
 		game.moveRoad = function () {
 			var roadCurrentPosition = parseFloat( game.roadBoxDiv.style.top );
 			game.startRoadAnimation( game.roadBoxDiv, 1, game.gearNumber, roadCurrentPosition, 0, 'px' );
-			game.accelerateBtn.removeEventListener( 'click', game.moveRoad );
 			game.stopAccelerationBtn.addEventListener( 'click', game.stopRoad );
 		};
 
@@ -293,8 +349,10 @@ var Game = ( function ( $ ) {
 		 * Stops Road movement
 		 */
 		game.stopRoad = function () {
+			console.log( 'stop' );
 			clearInterval( game.startRoadInterval );
 			var roadCurrentPos = parseFloat( game.roadBoxDiv.style.top );
+			console.log( 'journeyPoint = ' + game.journeyPoint );
 			game.stopRoadAnimation( game.roadBoxDiv, 1, 1, roadCurrentPos, game.windowHeight, 'px' );
 			game.roadBoxDiv.style.top = -game.windowHeight + 'px';
 			game.stopAccelerationBtn.removeEventListener( 'click', game.stopRoad );
@@ -312,18 +370,30 @@ var Game = ( function ( $ ) {
 	 */
 		game.startRoadAnimation = function ( element, timeInSec, speed, startPos, endPos, unit ) {
 			clearInterval( game.stopRoadInterval );
-			var pos = startPos;
+			console.log( 'startPos = ' + startPos + ' endpPos = ' + endPos );
+			var pos = -game.roadLineContainer.offsetHeight + window.innerHeight;
+
+			if ( true === game.gameOver ) {
+				return;
+			}
 				game.startRoadInterval = setInterval( frameStartFunc, timeInSec );
+				console.log( 'my pos= ' + pos );
+			if ( true === game.carWasStopped ) {
+				pos = game.journeyPoint;
+			}
 
 			function frameStartFunc() {
-				if ( endPos === pos ) {
+				if ( endPos === pos || 0 <= pos ) {
+					game.gameOver = true;
 					clearInterval( game.startRoadInterval );
 				} else {
 					pos = ( endPos > pos ) ? pos + speed : pos - speed;
-					if ( endPos <= pos || 0 === pos ) {
-						pos = -window.innerHeight;
-					}
 					element.style.top = pos + unit;
+
+					if ( 0 <= game.score ) {
+						game.score++;
+						game.scoreTextContainer.textContent = game.score;
+					}
 				}
 			};
 		};
@@ -339,19 +409,22 @@ var Game = ( function ( $ ) {
 		 * @param {string} unit px or %.
 		 */
 		game.stopRoadAnimation = function ( element, timeInSec, speed, startPos, endPos, unit ) {
-			var pos = startPos,
-				targetEndPos = -game.windowHeight + 'px';
+			var pos = startPos;
+
+			if ( true === game.gameOver ) {
+				return;
+			}
 				game.stopRoadInterval = setInterval( frameStopFunc, timeInSec );
 
 			function frameStopFunc() {
-				if ( ( startPos + 100 ) === pos ) {
+				if ( ( startPos + 1 ) === pos ) {
 					clearInterval( game.stopRoadInterval );
 				} else {
 					pos = ( endPos > pos ) ? pos + speed : pos - speed;
 					element.style.top = pos + unit;
 				}
 			}
-		}
+		};
 
 		/**
 		 * Animates an element from position 0 to
@@ -388,6 +461,10 @@ var Game = ( function ( $ ) {
 					}
 				}
 			}
+		};
+
+		game.calculateScore = function () {
+
 		};
 
 	return game;
