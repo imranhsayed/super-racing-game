@@ -39,7 +39,7 @@ var Game = ( function ( $ ) {
 		 */
 		game.screenSetUp = function ( startBtnClassName, btnName, bodyBackgroundClass ) {
 			game.createRoadBox();
-			game.createRoadLines( 20 );
+			game.createRoadLines( 40 );
 			game.startBttn = game.createElement( 'button', 'class', startBtnClassName );
 			game.startBttn.textContent = btnName;
 			game.body.appendChild( game.startBttn );
@@ -186,7 +186,7 @@ var Game = ( function ( $ ) {
 		 */
 		game.createAndDisplayCar = function () {
 			var carImage = game.createElement( 'img', 'class', 'car-img' );
-			carImage.setAttribute( 'src', 'images/car-image.png' );
+			carImage.setAttribute( 'src', 'images/car-forward.png' );
 			game.body.appendChild( carImage );
 			return carImage;
 		};
@@ -302,13 +302,13 @@ var Game = ( function ( $ ) {
 			leftDirectionBtn.addEventListener( 'click', function () {
 				carLeftPos = parseFloat( window.getComputedStyle( carImage ).left );
 				currentPos = Math.round( ( carLeftPos / game.windowWidth ) * 100 );
-				game.animate( carImage, 5, currentPos, 19, '%', 'left' );
+				game.animate( carImage, 5, currentPos, 12, '%', 'left' );
 			} );
 
 			rightDirectionBtn.addEventListener( 'click', function () {
 				carLeftPos = parseFloat( window.getComputedStyle( carImage ).left );
 				currentPos = Math.round( ( carLeftPos / game.windowWidth ) * 100 );
-				game.animate( carImage, 5, currentPos, 67, '%', 'left' );
+				game.animate( carImage, 5, currentPos, 62, '%', 'left' );
 			} );
 
 			/**

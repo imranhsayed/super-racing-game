@@ -71,16 +71,17 @@ body {
 .road-box {
 	overflow: hidden;
 	position: absolute;
+	background: url("images/road.jpg") repeat-y;
 	bottom: -700px;
 }
 
 .road-lines-left {
-	background: red;
+	/*background: red;*/
 	margin-top: 20%;
 }
 
 .road-lines-right {
-	background: blue;
+	/*background: blue;*/
 	margin-top: 20%;
 }
 
@@ -120,8 +121,8 @@ body {
 .car-img {
 	position: fixed;
 	bottom: 15%;
-	left: 19%;
-	width: 18%;
+	left: 12%;
+	width: 7em;
 	display: inline-block;
 }
 
