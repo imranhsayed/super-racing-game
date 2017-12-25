@@ -24,6 +24,11 @@ var Game = ( function ( $ ) {
 			game.roadLineContainer = game.createElement( 'div', 'class', 'road-line-container' );
 			game.roadLineContainerLeft = game.createElement( 'div', 'class', 'road-line-container-left' );
 			game.roadLineContainerRight = game.createElement( 'div', 'class', 'road-line-container-right' );
+			game.introMusic = document.getElementById( 'intro-music' );
+			game.backgroundMusic = document.getElementById( 'background-music' );
+			game.carStartUpSound = document.getElementById( 'car-start-up-sound' );
+			game.carRunningSound = document.getElementById( 'car-running-sound' );
+			game.breaksSound = document.getElementById( 'breaks-music' );
 			game.distance = 0;
 			game.carWasStopped = false;
 			game.gameOver = false;
@@ -38,8 +43,9 @@ var Game = ( function ( $ ) {
 		 * @constructor
 		 */
 		game.screenSetUp = function ( startBtnClassName, btnName, bodyBackgroundClass ) {
+			game.introMusic.play();
 			game.createRoadBox();
-			game.createRoadLines( 40 );
+			game.createRoadLines( 100 );
 			game.startBttn = game.createElement( 'button', 'class', startBtnClassName );
 			game.startBttn.textContent = btnName;
 			game.body.appendChild( game.startBttn );
@@ -80,8 +86,9 @@ var Game = ( function ( $ ) {
 		 */
 		game.gameStart = function () {
 			var carImage;
-
 			console.log( 'height = ' + game.roadLineContainer.offsetHeight );
+			game.introMusic.pause();
+			game.backgroundMusic.play();
 			game.body.classList.remove( 'home-screen-background' );
 			game.body.removeChild( game.startBttn );
 			carImage = game.createAndDisplayCar();
@@ -94,6 +101,8 @@ var Game = ( function ( $ ) {
 			game.stopAccelerationBtn = document.querySelector( '.stop-acceleration-img' );
 			game.roadBoxDiv.style.top = -game.windowHeight + 'px';
 			game.stopAccelerationBtn.addEventListener( 'click', function () {
+				game.breaksSound.play();
+				game.carRunningSound.pause();
 				game.gearNumber = 0;
 				game.gearCountText.textContent = '' + game.gearNumber + '';
 				game.journeyPoint = parseFloat( game.roadBoxDiv.style.top );
@@ -243,6 +252,8 @@ var Game = ( function ( $ ) {
 			if ( 5 <= game.gearNumber || true === game.gameOver ) {
 				return;
 			}
+			game.carStartUpSound.play();
+			game.carRunningSound.play();
 			game.journeyPoint = parseFloat( game.roadBoxDiv.style.top );
 			game.reduceGear = false;
 			game.stopRoad();
@@ -299,6 +310,10 @@ var Game = ( function ( $ ) {
 		 */
 		game.changeCarPos = function ( leftDirectionBtn, rightDirectionBtn, carImage ) {
 			var carLeftPos, currentPos;
+			
+			if ( true === game.gameOver ) {
+				return;
+			}
 			leftDirectionBtn.addEventListener( 'click', function () {
 				carLeftPos = parseFloat( window.getComputedStyle( carImage ).left );
 				currentPos = Math.round( ( carLeftPos / game.windowWidth ) * 100 );
@@ -308,7 +323,7 @@ var Game = ( function ( $ ) {
 			rightDirectionBtn.addEventListener( 'click', function () {
 				carLeftPos = parseFloat( window.getComputedStyle( carImage ).left );
 				currentPos = Math.round( ( carLeftPos / game.windowWidth ) * 100 );
-				game.animate( carImage, 5, currentPos, 62, '%', 'left' );
+				game.animate( carImage, 5, currentPos, 57, '%', 'left' );
 			} );
 
 			/**
@@ -389,6 +404,7 @@ var Game = ( function ( $ ) {
 					element.style.top = pos + unit;
 					console.log( pos );
 					game.calculateDistance( pos );
+					game.gameOverSettings( pos );
 				}
 			};
 		};
@@ -470,6 +486,13 @@ var Game = ( function ( $ ) {
 				} else {
 					game.distanceTextContainer.textContent = -( pos );
 				}
+			}
+		};
+
+		game.gameOverSettings = function ( pos ) {
+			if ( 0 <= pos ) {
+				game.gameOver = true;
+				game.carRunningSound.pause();
 			}
 		};
 
