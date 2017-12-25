@@ -24,7 +24,7 @@ var Game = ( function ( $ ) {
 			game.roadLineContainer = game.createElement( 'div', 'class', 'road-line-container' );
 			game.roadLineContainerLeft = game.createElement( 'div', 'class', 'road-line-container-left' );
 			game.roadLineContainerRight = game.createElement( 'div', 'class', 'road-line-container-right' );
-			game.score = 0;
+			game.distance = 0;
 			game.carWasStopped = false;
 			game.gameOver = false;
 		};
@@ -39,7 +39,7 @@ var Game = ( function ( $ ) {
 		 */
 		game.screenSetUp = function ( startBtnClassName, btnName, bodyBackgroundClass ) {
 			game.createRoadBox();
-			game.createRoadLines( 10 );
+			game.createRoadLines( 20 );
 			game.startBttn = game.createElement( 'button', 'class', startBtnClassName );
 			game.startBttn.textContent = btnName;
 			game.body.appendChild( game.startBttn );
@@ -90,6 +90,7 @@ var Game = ( function ( $ ) {
 			game.setRoadLineContainerLeft();
 			game.createAndDisplayMotionBtn( carImage );
 			game.createAndDisplayGearControls();
+			game.distanceTextContainer.textContent = game.roadLineContainer.offsetHeight - window.innerHeight;
 			game.stopAccelerationBtn = document.querySelector( '.stop-acceleration-img' );
 			game.roadBoxDiv.style.top = -game.windowHeight + 'px';
 			game.stopAccelerationBtn.addEventListener( 'click', function () {
@@ -119,9 +120,8 @@ var Game = ( function ( $ ) {
 		/**
 		 * Creates Road Box Divs on the left and right of the divider.
 		 *
-		 * @param {string} containerClassName Class name of the container div.
 		 */
-		game.createRoadBox = function ( containerClassName ) {
+		game.createRoadBox = function () {
 			game.roadBoxDiv = game.createElement( 'div', 'class', 'road-box' );
 			game.body.insertBefore( game.roadBoxDiv, game.hiddenElement );
 			game.roadBoxDiv.style.minWidth = game.windowWidth + 'px';
@@ -196,14 +196,14 @@ var Game = ( function ( $ ) {
 		 *
 		 * @param carImage
 		 */
-			game.createAndDisplayMotionBtn = function ( carImage ) {
+		game.createAndDisplayMotionBtn = function ( carImage ) {
 			var stopBtn = game.createElement( 'img', 'class', 'stop-acceleration-img' ),
 				gearControlContainer = game.createElement( 'div', 'class', 'gear-control-container' ),
 				leftDirectionBtn = game.createElement( 'img', 'class', 'left-direction-button' ),
 				rightDirectionBtn = game.createElement( 'img', 'class', 'right-direction-button' );
 
-				game.upArrowBtn = game.createElement( 'img', 'class', 'gear-up-arrow' );
-				game.downArrowBtn = game.createElement( 'img', 'class', 'gear-down-arrow' );
+			game.upArrowBtn = game.createElement( 'img', 'class', 'gear-up-arrow' );
+			game.downArrowBtn = game.createElement( 'img', 'class', 'gear-down-arrow' );
 
 			stopBtn.setAttribute( 'src', 'images/stops-button.png' );
 			game.upArrowBtn.setAttribute( 'src', 'images/up-arrow.png' );
@@ -234,8 +234,6 @@ var Game = ( function ( $ ) {
 
 			game.upArrowBtn.addEventListener( 'click', game.increaseGear );
 			game.downArrowBtn.addEventListener( 'click', game.decreaseGear );
-
-			// game.body.appendChild( game.gearBtn );
 		};
 
 		/**
@@ -245,7 +243,6 @@ var Game = ( function ( $ ) {
 			if ( 5 <= game.gearNumber || true === game.gameOver ) {
 				return;
 			}
-			game.carWasStopped = true;
 			game.journeyPoint = parseFloat( game.roadBoxDiv.style.top );
 			game.reduceGear = false;
 			game.stopRoad();
@@ -253,6 +250,7 @@ var Game = ( function ( $ ) {
 			game.gearCountText.textContent = '' + game.gearNumber + '';
 			game.moveRoad();
 			console.log( 'increase' );
+			game.carWasStopped = true;
 		};
 
 		/**
@@ -263,13 +261,13 @@ var Game = ( function ( $ ) {
 				return;
 			}
 			console.log( 'decrease' );
-			game.carWasStopped = true;
 			game.journeyPoint = parseFloat( game.roadBoxDiv.style.top );
 			game.reduceGear = true;
 			game.stopRoad();
 			game.gearNumber--;
 			game.gearCountText.textContent = '' + game.gearNumber + '';
 			game.moveRoad();
+			game.carWasStopped = true;
 		};
 
 		/**
@@ -278,14 +276,14 @@ var Game = ( function ( $ ) {
 		game.createGameInfoBox = function () {
 			var scoreLabel = game.createElement( 'p', 'class', 'score-label' ),
 				gearCountLabel = game.createElement( 'p', 'class', 'gear-count-label' );
-			game.scoreTextContainer = game.createElement( 'p', 'class', 'score-text-container' );
+			game.distanceTextContainer = game.createElement( 'p', 'class', 'score-text-container' );
 
 			game.gearCountText = game.createElement( 'p', 'class', 'gear-count-text' );
-			scoreLabel.textContent = 'Score';
+			scoreLabel.textContent = 'Distance';
 			gearCountLabel.textContent = 'Gear';
 			game.gameInfoContainer = game.createElement( 'div', 'class', 'game-info-container' );
 			game.gameInfoContainer.appendChild( scoreLabel );
-			game.gameInfoContainer.appendChild( game.scoreTextContainer );
+			game.gameInfoContainer.appendChild( game.distanceTextContainer );
 			game.gameInfoContainer.appendChild( gearCountLabel );
 			game.gameInfoContainer.appendChild( game.gearCountText );
 
@@ -389,11 +387,8 @@ var Game = ( function ( $ ) {
 				} else {
 					pos = ( endPos > pos ) ? pos + speed : pos - speed;
 					element.style.top = pos + unit;
-
-					if ( 0 <= game.score ) {
-						game.score++;
-						game.scoreTextContainer.textContent = game.score;
-					}
+					console.log( pos );
+					game.calculateDistance( pos );
 				}
 			};
 		};
@@ -463,8 +458,19 @@ var Game = ( function ( $ ) {
 			}
 		};
 
-		game.calculateScore = function () {
-
+		/**
+		 * Calculate Distance.
+		 *
+		 * @param pos Position
+		 */
+		game.calculateDistance = function ( pos ) {
+			if ( 0 >= game.distance ) {
+				if ( 0 < pos ) {
+					game.distanceTextContainer.textContent = 0;
+				} else {
+					game.distanceTextContainer.textContent = -( pos );
+				}
+			}
 		};
 
 	return game;
