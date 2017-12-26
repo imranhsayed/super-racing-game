@@ -26,13 +26,15 @@ var Game = ( function ( $ ) {
 			game.roadLineContainerRight = game.createElement( 'div', 'class', 'road-line-container-right' );
 			game.gameOverImg = game.createImgElement( 'game-over-img', 'game-over.gif' );
 			game.restartBtnImg = game.createImgElement( 'restart-btn', 'restart-button.png' );
+			game.homeCarImg = game.createImgElement( 'home-screen-car', 'home-screen-car-img.png' );
+			game.homeDanceImg = game.createImgElement( 'man-dancing', 'man-dancing.gif' );
 			game.introMusic = document.getElementById( 'intro-music' );
 			game.backgroundMusic = document.getElementById( 'background-music' );
 			game.carStartUpSound = document.getElementById( 'car-start-up-sound' );
 			game.carRunningSound = document.getElementById( 'car-running-sound' );
 			game.breaksSound = document.getElementById( 'breaks-music' );
 			game.distance = 0;
-			game.divCount = 10;
+			game.divCount = 1000;
 			game.carWasStopped = false;
 			game.gameOver = false;
 		};
@@ -51,8 +53,12 @@ var Game = ( function ( $ ) {
 			game.createRoadLines( game.divCount );
 			game.startBttn = game.createElement( 'button', 'class', startBtnClassName );
 			game.startBttn.textContent = btnName;
+			game.body.appendChild( game.homeDanceImg );
 			game.body.appendChild( game.startBttn );
-			game.startBtnAlignCenter( game.startBttn );
+			game.body.appendChild( game.homeCarImg );
+			game.alignCenter( game.homeDanceImg, false );
+			game.alignCenter( game.startBttn, true );
+			game.alignCenter( game.homeCarImg, false );
 			game.body.classList.add( bodyBackgroundClass );
 			game.startBttn.addEventListener( 'click', game.gameStart );
 
@@ -73,15 +79,20 @@ var Game = ( function ( $ ) {
 		};
 
 		/**
-		 * Aligns the Start Button in the center
+		 * Aligns the Element in the center of the screen.
+		 * The element needs to be given position as absolute in the stylesheet.
 		 *
-		 * @param startBtn
+		 * @param {string} element Element to be aligned in the center.
+		 * @param {boolean} top Top position false if we only want the alignment in the center horizontally and not vertically
 		 */
-		game.startBtnAlignCenter = function ( startBtn ) {
-			var startBtnWidth = startBtn.offsetWidth,
-				startBtnHeight = startBtn.offsetHeight;
-			startBtn.style.top = ( game.windowHeight / 2 ) - ( startBtnHeight / 2 ) + 'px';
-			startBtn.style.left = ( game.windowWidth / 2 )  - ( startBtnWidth / 2 ) + 'px';
+		game.alignCenter = function ( element, top ) {
+			var elementWidth = element.offsetWidth,
+				elementHeight = element.offsetHeight;
+			element.style.left = ( game.windowWidth / 2 )  - ( elementWidth / 2 ) + 'px';
+			if ( top ) {
+				element.style.top = ( game.windowHeight / 2 ) - ( elementHeight / 2 ) + 'px';
+			}
+
 		};
 
 		/**
@@ -94,6 +105,8 @@ var Game = ( function ( $ ) {
 			game.backgroundMusic.play();
 			game.body.classList.remove( 'home-screen-background' );
 			game.body.removeChild( game.startBttn );
+			game.body.removeChild( game.homeCarImg );
+			game.body.removeChild( game.homeDanceImg );
 			carImage = game.createAndDisplayCar();
 			document.querySelector( '.road-box' ).style.display = 'block';
 			game.createGameInfoBox();
@@ -522,14 +535,15 @@ var Game = ( function ( $ ) {
 		 * Inserts the vehicles on the left.
 		 */
 		game.insertLeftVehicle = function () {
-			game.createVehicleAndAddToDom( 'id-16', 'bike-red', 'bike-red.png' );
+			game.createVehicleAndAddToDom( 'id-988', 'bike-red', 'bike-red.png' );
+			game.createVehicleAndAddToDom( 'id-970', 'bus-red', 'bus-red.png' );
 		};
 
 		/**
 		 * Inserts the vehicles on the right.
 		 */
 		game.insertRightVehicle = function () {
-			game.createVehicleAndAddToDom( 'id-34', 'car-audi', 'car-audi.png' );
+			game.createVehicleAndAddToDom( 'id-1980', 'car-audi', 'car-audi.png' );
 		};
 
 		/**

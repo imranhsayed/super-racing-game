@@ -115,6 +115,20 @@ body {
 	border-radius: 50%;
 }
 
+/* Home Screen Car Image */
+.home-screen-car {
+	position: absolute;
+	width: 13em;
+	top: 24em;
+}
+
+/* Home Screen Man Dancing */
+.man-dancing {
+	position: absolute;
+	width: 13em;
+	top: 2em;
+}
+
 /* Home Screen Background */
 .home-screen-background {
 	background: cornsilk;
