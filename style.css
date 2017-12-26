@@ -77,13 +77,13 @@ body {
 }
 
 .road-lines-left {
-	background: red;
+	/*background: red;*/
 	margin-top: 20%;
 	text-align: center;
 }
 
 .road-lines-right {
-	background: blue;
+	/*background: blue;*/
 	margin-top: 20%;
 	text-align: center;
 
@@ -199,5 +199,21 @@ body {
 	width: 3.7em;
 }
 
+/* Game Over Image */
+.game-over-img {
+	width: 11em;
+	position: fixed;
+	text-align: center;
+	left: 27%;
+	top: 10%;
+}
 
+.restart-btn {
+	width: 5em;
+	position: fixed;
+	left: 40%;
+	top: 21%;
+	text-align: center;
+	border-radius: 0.15em;
+}
 

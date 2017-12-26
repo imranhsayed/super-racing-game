@@ -24,13 +24,15 @@ var Game = ( function ( $ ) {
 			game.roadLineContainer = game.createElement( 'div', 'class', 'road-line-container' );
 			game.roadLineContainerLeft = game.createElement( 'div', 'class', 'road-line-container-left' );
 			game.roadLineContainerRight = game.createElement( 'div', 'class', 'road-line-container-right' );
+			game.gameOverImg = game.createImgElement( 'game-over-img', 'game-over.gif' );
+			game.restartBtnImg = game.createImgElement( 'restart-btn', 'restart-button.png' );
 			game.introMusic = document.getElementById( 'intro-music' );
 			game.backgroundMusic = document.getElementById( 'background-music' );
 			game.carStartUpSound = document.getElementById( 'car-start-up-sound' );
 			game.carRunningSound = document.getElementById( 'car-running-sound' );
 			game.breaksSound = document.getElementById( 'breaks-music' );
 			game.distance = 0;
-			game.divCount = 20;
+			game.divCount = 10;
 			game.carWasStopped = false;
 			game.gameOver = false;
 		};
@@ -127,6 +129,20 @@ var Game = ( function ( $ ) {
 			var createdElement = document.createElement( elementType );
 			createdElement.setAttribute( attrName, attrVal );
 			return createdElement;
+		};
+
+		/**
+		 * Creates an Image element and sets the image source with the given imageName
+		 *
+		 * @param {string} className Class name for image.
+		 * @param {string} imgName Image Name.
+		 * @return {string} imgEl Returns created img element.
+		 */
+		game.createImgElement = function ( className, imgName ) {
+			var imgEl = game.createElement( 'img', 'class', className ),
+				srcVal = 'images/'+ imgName;
+			imgEl.setAttribute( 'src', srcVal );
+			return imgEl;
 		};
 
 		/**
@@ -503,18 +519,6 @@ var Game = ( function ( $ ) {
 		};
 
 		/**
-		 * Sets the game.gameOver to true when the position becomes equal to 0
-		 *
-		 * @param pos Current position.
-		 */
-		game.gameOverSettings = function ( pos ) {
-			if ( 0 <= pos ) {
-				game.gameOver = true;
-				game.carRunningSound.pause();
-			}
-		};
-
-		/**
 		 * Inserts the vehicles on the left.
 		 */
 		game.insertLeftVehicle = function () {
@@ -542,6 +546,28 @@ var Game = ( function ( $ ) {
 				vehicleImage = game.createElement( 'img', 'class', classes );
 			vehicleImage.setAttribute( 'src', srcValue );
 			divEl.appendChild( vehicleImage );
+		};
+
+		/**
+		 * Sets the game.gameOver to true when the position becomes equal to 0.
+		 * Appends the game over image.
+		 *
+		 * @param pos Current position.
+		 */
+		game.gameOverSettings = function ( pos ) {
+			if ( 0 <= pos ) {
+				game.gameOver = true;
+				game.carRunningSound.pause();
+
+				if ( ! game.body.contains( game.gameOverImg ) ) {
+					game.body.appendChild( game.gameOverImg );
+					game.body.appendChild( game.restartBtnImg );
+					game.restartBtnImg.addEventListener( 'click', function () {
+						location.reload();
+					} );
+				}
+
+			}
 		};
 
 	return game;
