@@ -7,7 +7,7 @@ var Game = ( function ( $ ) {
 		 */
 		game.init = function () {
 			game.config();
-			game.screenSetUp( 'game-start-level-one', 'Start', 'home-screen-background' );
+			game.screenSetUp( 'game-start-level-one', '', 'home-screen-background' );
 		};
 
 		/**
@@ -30,6 +30,7 @@ var Game = ( function ( $ ) {
 			game.carRunningSound = document.getElementById( 'car-running-sound' );
 			game.breaksSound = document.getElementById( 'breaks-music' );
 			game.distance = 0;
+			game.divCount = 20;
 			game.carWasStopped = false;
 			game.gameOver = false;
 		};
@@ -45,7 +46,7 @@ var Game = ( function ( $ ) {
 		game.screenSetUp = function ( startBtnClassName, btnName, bodyBackgroundClass ) {
 			game.introMusic.play();
 			game.createRoadBox();
-			game.createRoadLines( 100 );
+			game.createRoadLines( game.divCount );
 			game.startBttn = game.createElement( 'button', 'class', startBtnClassName );
 			game.startBttn.textContent = btnName;
 			game.body.appendChild( game.startBttn );
@@ -109,6 +110,8 @@ var Game = ( function ( $ ) {
 				game.carWasStopped = true;
 				game.stopRoad();
 			} );
+			game.insertLeftVehicle();
+			game.insertRightVehicle();
 		};
 
 		/**
@@ -138,7 +141,7 @@ var Game = ( function ( $ ) {
 			document.querySelector( '.road-box' ).appendChild( game.roadLineContainer );
 			game.roadLineContainerLeft.style.minWidth = ( game.windowWidth / 2 ) + 'px';
 			game.roadLineContainerLeft.style.minHeight = ( game.windowHeight ) + 'px';
-			game.roadLineContainerRight.style.minWidth = ( game.windowWidth / 2.4 ) + 'px';
+			game.roadLineContainerRight.style.minWidth = ( game.windowWidth / 2 ) + 'px';
 			game.roadLineContainerRight.style.minHeight = ( game.windowHeight ) + 'px';
 
 			console.log( game.windowWidth );
@@ -153,29 +156,39 @@ var Game = ( function ( $ ) {
 		 */
 		game.createRoadLines = function ( roadLineCount ) {
 			for ( var i = 0; i < roadLineCount; i++ ) {
-				game.createRoadLinesLeft();
-				game.createRoadLinesRight();
+				game.createRoadLinesLeft( i );
+				game.createRoadLinesRight( i );
 			}
 		};
 
 		/**
 		 * Create Left Road Lines
+		 *
+		 * @param {int} i Counter for setting id.
 		 */
-		game.createRoadLinesLeft = function () {
+		game.createRoadLinesLeft = function ( i ) {
 			var roadLineBoxLeft = game.createElement( 'div', 'class', 'road-lines-left' );
-			roadLineBoxLeft.style.maxWidth = ( game.windowWidth / 2 ) + 'px';
+			i = i + 1;
+			i = 'id-' + i;
+			roadLineBoxLeft.style.maxWidth = ( game.windowWidth ) + 'px';
 			roadLineBoxLeft.style.minHeight = ( game.windowHeight / 7 ) + 'px';
+			roadLineBoxLeft.setAttribute( 'id', i );
 			game.roadLineContainerLeft.appendChild( roadLineBoxLeft );
 			game.roadLineContainer.appendChild( game.roadLineContainerLeft );
 		};
 
 		/**
 		 * Create right Road Lines.
+		 *
+		 * @param {int} i Counter for setting id
 		 */
-		game.createRoadLinesRight = function () {
+		game.createRoadLinesRight = function ( i ) {
 			var roadLineBoxRight = game.createElement( 'div', 'class', 'road-lines-right' );
-			roadLineBoxRight.style.maxWidth = ( game.windowWidth / 2 ) + 'px';
+			i = i + 1 + game.divCount;
+			i = 'id-' + i;
+			roadLineBoxRight.style.maxWidth = ( game.windowWidth ) + 'px';
 			roadLineBoxRight.style.minHeight = ( game.windowHeight / 7 ) + 'px';
+			roadLineBoxRight.setAttribute( 'id', i );
 			game.roadLineContainerRight.appendChild( roadLineBoxRight );
 			game.roadLineContainer.appendChild( game.roadLineContainerRight );
 		};
@@ -489,11 +502,46 @@ var Game = ( function ( $ ) {
 			}
 		};
 
+		/**
+		 * Sets the game.gameOver to true when the position becomes equal to 0
+		 *
+		 * @param pos Current position.
+		 */
 		game.gameOverSettings = function ( pos ) {
 			if ( 0 <= pos ) {
 				game.gameOver = true;
 				game.carRunningSound.pause();
 			}
+		};
+
+		/**
+		 * Inserts the vehicles on the left.
+		 */
+		game.insertLeftVehicle = function () {
+			game.createVehicleAndAddToDom( 'id-16', 'bike-red', 'bike-red.png' );
+		};
+
+		/**
+		 * Inserts the vehicles on the right.
+		 */
+		game.insertRightVehicle = function () {
+			game.createVehicleAndAddToDom( 'id-34', 'car-audi', 'car-audi.png' );
+		};
+
+		/**
+		 * Creates Vehicle image element based on give id and class name and appends it to the container div.
+		 *
+		 * @param {string} id ID for container div.
+		 * @param {string} uniqueClassName ClassName for Image.
+		 * @param {string} imageName Image name
+		 */
+		game.createVehicleAndAddToDom = function ( id, uniqueClassName, imageName ) {
+			var divEl = document.getElementById( id ),
+				classes = 'vehicle-image ' + uniqueClassName,
+				srcValue = 'images/' + imageName,
+				vehicleImage = game.createElement( 'img', 'class', classes );
+			vehicleImage.setAttribute( 'src', srcValue );
+			divEl.appendChild( vehicleImage );
 		};
 
 	return game;

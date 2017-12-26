@@ -77,13 +77,16 @@ body {
 }
 
 .road-lines-left {
-	/*background: red;*/
+	background: red;
 	margin-top: 20%;
+	text-align: center;
 }
 
 .road-lines-right {
-	/*background: blue;*/
+	background: blue;
 	margin-top: 20%;
+	text-align: center;
+
 }
 
 .road-line-container-left {
@@ -92,7 +95,6 @@ body {
 
 .road-line-container-right {
 	float: right;
-	margin-right: 21px;
 }
 
 .road-line-container {
@@ -106,11 +108,11 @@ body {
 /* Game Start Button */
 .game-start-level-one {
 	position: absolute;
-	padding: 20px;
-	background: #85C413;
+	padding: 3em;
 	color: #ffffff;
-	letter-spacing: 2px;
-	font-size: 1.2em;
+	background-image: url("images/start-button.png");
+	background-size: 100%;
+	border-radius: 50%;
 }
 
 /* Home Screen Background */
@@ -190,6 +192,11 @@ body {
 
 .score-label {
 	padding-top: 0.5em;
+}
+
+/* Vehicles Styles */
+.vehicle-image {
+	width: 3.7em;
 }
 
 
