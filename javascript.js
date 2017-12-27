@@ -28,11 +28,13 @@ var Game = ( function ( $ ) {
 			game.restartBtnImg = game.createImgElement( 'restart-btn', 'restart-button.png' );
 			game.homeCarImg = game.createImgElement( 'home-screen-car', 'home-screen-car-img.png' );
 			game.homeDanceImg = game.createImgElement( 'man-dancing', 'man-dancing.gif' );
+			game.explosionImg = game.createImgElement( 'explosion-img', 'explosion.gif' );
 			game.introMusic = document.getElementById( 'intro-music' );
 			game.backgroundMusic = document.getElementById( 'background-music' );
 			game.carStartUpSound = document.getElementById( 'car-start-up-sound' );
 			game.carRunningSound = document.getElementById( 'car-running-sound' );
 			game.breaksSound = document.getElementById( 'breaks-music' );
+			game.explosionSound = document.getElementById( 'explosion-sound' );
 			game.distance = 0;
 			game.divCount = 1000;
 			game.counter = 0;
@@ -116,7 +118,15 @@ var Game = ( function ( $ ) {
 			game.distanceTextContainer.textContent = game.roadLineContainer.offsetHeight - window.innerHeight;
 			game.stopAccelerationBtn = document.querySelector( '.stop-acceleration-img' );
 			game.roadBoxDiv.style.top = -game.windowHeight + 'px';
-			game.stopAccelerationBtn.addEventListener( 'click', function () {
+			game.insertLeftVehicle();
+			game.insertRightVehicle();
+			game.currentVehicle = document.getElementById( 'bike-red' );
+		};
+
+		/**
+		 * Stops acceleration in the click of stop button.
+		 */
+		game.stopAcceleration = function () {
 				game.breaksSound.play();
 				game.carRunningSound.pause();
 				game.gearNumber = 0;
@@ -124,10 +134,6 @@ var Game = ( function ( $ ) {
 				game.journeyPoint = parseFloat( game.roadBoxDiv.style.top );
 				game.carWasStopped = true;
 				game.stopRoad();
-			} );
-			game.insertLeftVehicle();
-			game.insertRightVehicle();
-			game.currentVehicle = document.getElementById( 'bike-red' );
 		};
 
 		/**
@@ -294,6 +300,8 @@ var Game = ( function ( $ ) {
 			if ( 5 <= game.gearNumber || true === game.gameOver ) {
 				return;
 			}
+			game.stopAccelerationBtn.removeEventListener( 'click', game.stopAcceleration );
+			game.stopAccelerationBtn.addEventListener( 'click', game.stopAcceleration );
 			game.carStartUpSound.play();
 			game.carRunningSound.play();
 			game.journeyPoint = parseFloat( game.roadBoxDiv.style.top );
@@ -753,8 +761,14 @@ var Game = ( function ( $ ) {
 		 * Performs certain actions on collision.
 		 */
 		game.actionsOnCollision = function () {
-			/* Add display none to all the vehicles */
+			/* Add display none to all the vehicles and remove car image. */
 			game.roadLineContainer.classList.add( 'display' );
+			game.carImage.remove();
+			game.body.appendChild( game.explosionImg );
+			game.explosionSound.play();
+			setTimeout( function () {
+				game.explosionImg.remove();
+			}, 800 );
 		};
 
 	return game;

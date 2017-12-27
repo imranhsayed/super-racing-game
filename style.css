@@ -235,3 +235,11 @@ body {
 	border-radius: 0.15em;
 }
 
+/* Explosion Image */
+.explosion-img {
+	position: absolute;
+	width: 25em;
+	text-align: center;
+	right: -2%;
+}
+
