@@ -37,6 +37,7 @@ var Game = ( function ( $ ) {
 			game.divCount = 1000;
 			game.counter = 0;
 			game.carWasStopped = false;
+			game.collision = false;
 			game.gameOver = false;
 		};
 
@@ -375,6 +376,9 @@ var Game = ( function ( $ ) {
 		 * Moves car Left on hitting the left directional button.
 		 */
 		game.moveCarLeft = function () {
+			if ( true === game.gameOver ) {
+				return;
+			}
 			game.carLeftPos = parseFloat( window.getComputedStyle( game.carImage ).left );
 			game.currentPos = Math.round( ( game.carLeftPos / game.windowWidth ) * 100 );
 			game.animate( game.carImage, 5, game.currentPos, 12, '%', 'left' );
@@ -382,9 +386,12 @@ var Game = ( function ( $ ) {
 		};
 
 		/**
-		 * MOves car Right when hitting the Right Directional button
+		 * Moves car Right when hitting the Right Directional button
 		 */
 		game.moveCarRight = function () {
+			if ( true === game.gameOver ) {
+				return;
+			}
 			game.carLeftPos = parseFloat( window.getComputedStyle( game.carImage ).left );
 			game.currentPos = Math.round( ( game.carLeftPos / game.windowWidth ) * 100 );
 			game.animate( game.carImage, 5, game.currentPos, 57, '%', 'left' );
@@ -392,11 +399,14 @@ var Game = ( function ( $ ) {
 			game.collideFromRight();
 		};
 
+		/**
+		 * Creates settings for collision when left arrow is pressed
+		 */
 		game.collideFromLeft = function () {
 			clearInterval( game.collideFromRightInterval );
 
 			game.collideFromLeftInterval = setInterval( function () {
-				if ( true === game.gameOver ) {
+				if ( true === game.gameOver || true === game.collision ) {
 					clearInterval( game.collideFromLeftInterval );
 				} else {
 
@@ -408,48 +418,46 @@ var Game = ( function ( $ ) {
 					if ( ( vehicleRightPos > carLeftPos ) && ( 200 > vehicleRightPos ) && 80 > carXPos ) {
 						for ( var i = 0; i <= 5; i++ ) {
 							if ( vehicleYPos === carYPos ) {
-								console.log( 'alert' );
-								game.gameOver = true;
-							}
-							vehicleYPos++;
-							if ( true === game.gameOver ) {
-								game.gameOverSettings(0);
+								game.collision = true;
+								game.gameOverSettings( 0, true );
 								break;
 							}
+							vehicleYPos++;
 						}
 					}
 				}
 			}, 1 );
 		};
 
-	game.collideFromRight = function () {
-		clearInterval( game.collideFromLeftInterval );
-		game.collideFromRightInterval = setInterval( function () {
-			if ( true === game.gameOver ) {
-				clearInterval( game.collideFromRightInterval );
-			} else {
+		/**
+		 * Creates settings for collision when right arrow is pressed
+		 */
+		game.collideFromRight = function () {
+			clearInterval( game.collideFromLeftInterval );
 
-				var vehicleLeftPos = Math.round( game.currentVehicle.getBoundingClientRect().left ),
-					vehicleYPos = Math.round( game.currentVehicle.getBoundingClientRect().y ),
-					carYPos = Math.round( game.carImage.getBoundingClientRect().y ),
-					carRightPos = Math.round( game.carImage.getBoundingClientRect().right),
-					carXPos = Math.round( game.carImage.getBoundingClientRect().x );
-				if ( ( vehicleLeftPos < carRightPos ) && ( 200 < vehicleLeftPos ) && 80 < carXPos ) {
-					for ( var i = 0; i <= 5; i++ ) {
-						if ( vehicleYPos === carYPos ) {
-							console.log( 'alert' );
-							game.gameOver = true;
-						}
-						vehicleYPos++;
-						if ( true === game.gameOver ) {
-							game.gameOverSettings(0);
-							break;
+			game.collideFromRightInterval = setInterval( function () {
+				if ( true === game.gameOver || true === game.collision ) {
+					clearInterval( game.collideFromRightInterval );
+				} else {
+
+					var vehicleLeftPos = Math.round( game.currentVehicle.getBoundingClientRect().left ),
+						vehicleYPos = Math.round( game.currentVehicle.getBoundingClientRect().y ),
+						carYPos = Math.round( game.carImage.getBoundingClientRect().y ),
+						carRightPos = Math.round( game.carImage.getBoundingClientRect().right),
+						carXPos = Math.round( game.carImage.getBoundingClientRect().x );
+					if ( ( vehicleLeftPos < carRightPos ) && ( 200 < vehicleLeftPos ) && 80 < carXPos ) {
+						for ( var i = 0; i <= 5; i++ ) {
+							if ( vehicleYPos === carYPos ) {
+								game.collision = true;
+								game.gameOverSettings( 0, true );
+								break;
+							}
+							vehicleYPos++;
 						}
 					}
 				}
-			}
-		}, 1 );
-	};
+			}, 1 );
+		};
 
 		/**
 		 * Sets the Road in Motion and then removes the event listener.
@@ -486,7 +494,7 @@ var Game = ( function ( $ ) {
 			var vehicleYPos, carYPos, carXPos,
 				pos = -game.roadLineContainer.offsetHeight + window.innerHeight;
 
-			if ( true === game.gameOver ) {
+			if ( true === game.gameOver || true === game.collision ) {
 				return;
 			}
 				game.startRoadInterval = setInterval( frameStartFunc, timeInSec );
@@ -503,7 +511,7 @@ var Game = ( function ( $ ) {
 					pos = ( endPos > pos ) ? pos + speed : pos - speed;
 					element.style.top = pos + unit;
 					game.calculateDistance( pos );
-					game.gameOverSettings( pos );
+					game.gameOverSettings( pos, false );
 					game.checkWhichVehicleIsInGameArea();
 					game.setUpCollision( vehicleYPos, carYPos, carXPos );
 				}
@@ -523,7 +531,7 @@ var Game = ( function ( $ ) {
 		game.stopRoadAnimation = function ( element, timeInSec, speed, startPos, endPos, unit ) {
 			var pos = startPos;
 
-			if ( true === game.gameOver ) {
+			if ( true === game.gameOver || true === game.collision ) {
 				return;
 			}
 				game.stopRoadInterval = setInterval( frameStopFunc, timeInSec );
@@ -562,12 +570,10 @@ var Game = ( function ( $ ) {
 		 */
 		game.setUpLeftCollision = function ( vehicleYPos, carYPos, carXPos ) {
 
-			var carPos = carYPos + Math.round( game.currentVehicle.getBoundingClientRect().height );
 			vehicleYPos = ( Math.round( game.currentVehicle.getBoundingClientRect().y ) );
 			carXPos = Math.round( game.carImage.getBoundingClientRect().x );
 			carYPos = Math.round( game.carImage.getBoundingClientRect().y ) - game.carImage.getBoundingClientRect().height + 10;
-			// console.log( game.currentVehicle.getBoundingClientRect() );
-			// console.log( game.carImage.getBoundingClientRect() );
+
 			/* If the vehicle has not entered the play area then return. */
 			if ( 0 > vehicleYPos && game.innerHeight < vehicleYPos ) {
 				return;
@@ -575,13 +581,11 @@ var Game = ( function ( $ ) {
 			if ( 80 > carXPos ) {
 				for ( var i = 0; i <= 5; i++ ) {
 					if ( vehicleYPos === carYPos ) {
-						game.gameOver = true;
-					}
-					vehicleYPos++;
-					if ( true === game.gameOver ) {
-						game.gameOverSettings( 0 );
+						game.collision = true;
+						game.gameOverSettings( 0, true );
 						break;
 					}
+					vehicleYPos++;
 				}
 			}
 		};
@@ -607,13 +611,11 @@ var Game = ( function ( $ ) {
 			if ( 180 < carXPos ) {
 				for ( var i = 0; i <= 5; i++ ) {
 					if ( vehicleYPos === carYPos ) {
-						game.gameOver = true;
-					}
-					vehicleYPos++;
-					if ( true === game.gameOver ) {
-						game.gameOverSettings( 0 );
+						game.collision = true;
+						game.gameOverSettings( 0, true );
 						break;
 					}
+					vehicleYPos++;
 				}
 			}
 		};
@@ -725,10 +727,14 @@ var Game = ( function ( $ ) {
 		 * Sets the game.gameOver to true when the position becomes equal to 0.
 		 * Appends the game over image.
 		 *
-		 * @param pos Current position.
+		 * @param {int} pos Current position.
+		 * @param {bool} collision If collision has happened then pass collision value as true, false otherwise.
 		 */
-		game.gameOverSettings = function ( pos ) {
+		game.gameOverSettings = function ( pos, collision ) {
 			if ( 0 <= pos ) {
+				if ( collision ) {
+					/* Do something */
+				}
 				game.gameOver = true;
 				game.carRunningSound.pause();
 				clearInterval( game.startRoadInterval );
