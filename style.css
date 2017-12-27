@@ -64,6 +64,10 @@ body {
 	position: relative;
 }
 
+.display {
+	display: none;
+}
+
 /*
  * 1.0.1 Main Road Box
  */

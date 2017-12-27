@@ -710,9 +710,8 @@ var Game = ( function ( $ ) {
 		 */
 		game.checkWhichVehicleIsInGameArea = function () {
 			game.allVehicles = document.querySelectorAll( '.vehicle-image' );
-			// console.log( game.allVehicles );
-			// console.log( game.allVehicles.length );
 			var totalVehicleCount = game.allVehicles.length, vehicleYPos;
+
 			for ( var i = 0; i < totalVehicleCount; i++ ) {
 				vehicleYPos = ( Math.round( game.allVehicles[ i ].getBoundingClientRect().y ) );
 				if ( 0 < vehicleYPos && game.windowHeight > vehicleYPos ) {
@@ -733,7 +732,7 @@ var Game = ( function ( $ ) {
 		game.gameOverSettings = function ( pos, collision ) {
 			if ( 0 <= pos ) {
 				if ( collision ) {
-					/* Do something */
+					game.actionsOnCollision();
 				}
 				game.gameOver = true;
 				game.carRunningSound.pause();
@@ -748,6 +747,14 @@ var Game = ( function ( $ ) {
 				}
 
 			}
+		};
+
+		/**
+		 * Performs certain actions on collision.
+		 */
+		game.actionsOnCollision = function () {
+			/* Add display none to all the vehicles */
+			game.roadLineContainer.classList.add( 'display' );
 		};
 
 	return game;
