@@ -35,6 +35,7 @@ var Game = ( function ( $ ) {
 			game.breaksSound = document.getElementById( 'breaks-music' );
 			game.distance = 0;
 			game.divCount = 1000;
+			game.counter = 0;
 			game.carWasStopped = false;
 			game.gameOver = false;
 		};
@@ -99,19 +100,17 @@ var Game = ( function ( $ ) {
 		 * Starts the game.
 		 */
 		game.gameStart = function () {
-			var carImage;
-			console.log( 'height = ' + game.roadLineContainer.offsetHeight );
 			game.introMusic.pause();
 			game.backgroundMusic.play();
 			game.body.classList.remove( 'home-screen-background' );
 			game.body.removeChild( game.startBttn );
 			game.body.removeChild( game.homeCarImg );
 			game.body.removeChild( game.homeDanceImg );
-			carImage = game.createAndDisplayCar();
+			game.carImage = game.createAndDisplayCar();
 			document.querySelector( '.road-box' ).style.display = 'block';
 			game.createGameInfoBox();
 			game.setRoadLineContainerLeft();
-			game.createAndDisplayMotionBtn( carImage );
+			game.createAndDisplayMotionBtn();
 			game.createAndDisplayGearControls();
 			game.distanceTextContainer.textContent = game.roadLineContainer.offsetHeight - window.innerHeight;
 			game.stopAccelerationBtn = document.querySelector( '.stop-acceleration-img' );
@@ -127,6 +126,7 @@ var Game = ( function ( $ ) {
 			} );
 			game.insertLeftVehicle();
 			game.insertRightVehicle();
+			game.currentVehicle = document.getElementById( 'bike-red' );
 		};
 
 		/**
@@ -236,18 +236,17 @@ var Game = ( function ( $ ) {
 		 * @return {string} carImage car Image element.
 		 */
 		game.createAndDisplayCar = function () {
-			var carImage = game.createElement( 'img', 'class', 'car-img' );
-			carImage.setAttribute( 'src', 'images/car-forward.png' );
-			game.body.appendChild( carImage );
-			return carImage;
+			game.carImage = game.createElement( 'img', 'class', 'car-img' );
+			game.carImage.setAttribute( 'src', 'images/car-forward.png' );
+			game.body.appendChild( game.carImage );
+			return game.carImage;
 		};
 
 		/**
 		 * Create and Display Motion Buttons : Gear Up, Right Direction, Left Direction, Gear Down, Stop Button.
 		 *
-		 * @param carImage
 		 */
-		game.createAndDisplayMotionBtn = function ( carImage ) {
+		game.createAndDisplayMotionBtn = function () {
 			var stopBtn = game.createElement( 'img', 'class', 'stop-acceleration-img' ),
 				gearControlContainer = game.createElement( 'div', 'class', 'gear-control-container' ),
 				leftDirectionBtn = game.createElement( 'img', 'class', 'left-direction-button' ),
@@ -270,7 +269,7 @@ var Game = ( function ( $ ) {
 			game.body.appendChild( gearControlContainer );
 			game.clearFloatEl = game.createElement( 'div', 'class', 'clear' );
 			gearControlContainer.appendChild( game.clearFloatEl );
-			game.changeCarPos( leftDirectionBtn, rightDirectionBtn, carImage );
+			game.changeCarPos( leftDirectionBtn, rightDirectionBtn, game.carImage );
 
 		};
 
@@ -302,7 +301,6 @@ var Game = ( function ( $ ) {
 			game.gearNumber++;
 			game.gearCountText.textContent = '' + game.gearNumber + '';
 			game.moveRoad();
-			console.log( 'increase' );
 			game.carWasStopped = true;
 		};
 
@@ -313,7 +311,6 @@ var Game = ( function ( $ ) {
 			if ( 1 >= game.gearNumber || true === game.gameOver ) {
 				return;
 			}
-			console.log( 'decrease' );
 			game.journeyPoint = parseFloat( game.roadBoxDiv.style.top );
 			game.reduceGear = true;
 			game.stopRoad();
@@ -348,24 +345,23 @@ var Game = ( function ( $ ) {
 		 *
 		 * @param leftDirectionBtn
 		 * @param rightDirectionBtn
-		 * @param carImage
 		 */
-		game.changeCarPos = function ( leftDirectionBtn, rightDirectionBtn, carImage ) {
+		game.changeCarPos = function ( leftDirectionBtn, rightDirectionBtn ) {
 			var carLeftPos, currentPos;
 			
 			if ( true === game.gameOver ) {
 				return;
 			}
 			leftDirectionBtn.addEventListener( 'click', function () {
-				carLeftPos = parseFloat( window.getComputedStyle( carImage ).left );
+				carLeftPos = parseFloat( window.getComputedStyle( game.carImage ).left );
 				currentPos = Math.round( ( carLeftPos / game.windowWidth ) * 100 );
-				game.animate( carImage, 5, currentPos, 12, '%', 'left' );
+				game.animate( game.carImage, 5, currentPos, 12, '%', 'left' );
 			} );
 
 			rightDirectionBtn.addEventListener( 'click', function () {
-				carLeftPos = parseFloat( window.getComputedStyle( carImage ).left );
+				carLeftPos = parseFloat( window.getComputedStyle( game.carImage ).left );
 				currentPos = Math.round( ( carLeftPos / game.windowWidth ) * 100 );
-				game.animate( carImage, 5, currentPos, 57, '%', 'left' );
+				game.animate( game.carImage, 5, currentPos, 57, '%', 'left' );
 			} );
 
 			/**
@@ -404,10 +400,8 @@ var Game = ( function ( $ ) {
 		 * Stops Road movement
 		 */
 		game.stopRoad = function () {
-			console.log( 'stop' );
 			clearInterval( game.startRoadInterval );
 			var roadCurrentPos = parseFloat( game.roadBoxDiv.style.top );
-			console.log( 'journeyPoint = ' + game.journeyPoint );
 			game.stopRoadAnimation( game.roadBoxDiv, 1, 1, roadCurrentPos, game.windowHeight, 'px' );
 			game.roadBoxDiv.style.top = -game.windowHeight + 'px';
 			game.stopAccelerationBtn.removeEventListener( 'click', game.stopRoad );
@@ -425,17 +419,17 @@ var Game = ( function ( $ ) {
 	 */
 		game.startRoadAnimation = function ( element, timeInSec, speed, startPos, endPos, unit ) {
 			clearInterval( game.stopRoadInterval );
-			console.log( 'startPos = ' + startPos + ' endpPos = ' + endPos );
-			var pos = -game.roadLineContainer.offsetHeight + window.innerHeight;
+			var vehicleYPos, carYPos, carXPos,
+				pos = -game.roadLineContainer.offsetHeight + window.innerHeight;
 
 			if ( true === game.gameOver ) {
 				return;
 			}
 				game.startRoadInterval = setInterval( frameStartFunc, timeInSec );
-				console.log( 'my pos= ' + pos );
 			if ( true === game.carWasStopped ) {
 				pos = game.journeyPoint;
 			}
+
 
 			function frameStartFunc() {
 				if ( endPos === pos || 0 <= pos ) {
@@ -444,11 +438,12 @@ var Game = ( function ( $ ) {
 				} else {
 					pos = ( endPos > pos ) ? pos + speed : pos - speed;
 					element.style.top = pos + unit;
-					console.log( pos );
 					game.calculateDistance( pos );
 					game.gameOverSettings( pos );
+					game.checkWhichVehicleIsInGameArea();
+					game.setUpCollision( vehicleYPos, carYPos, carXPos );
 				}
-			};
+			}
 		};
 
 		/**
@@ -475,6 +470,93 @@ var Game = ( function ( $ ) {
 				} else {
 					pos = ( endPos > pos ) ? pos + speed : pos - speed;
 					element.style.top = pos + unit;
+				}
+			}
+		};
+
+		/**
+		 * Calls the collision functions basis the type of collision left or right.
+		 *
+		 * @param {int} vehicleYPos Vehicle's Y position.
+		 * @param {int} carYPos  Car's Y Position.
+		 * @param {int} carXPos Car's X Position
+		 */
+		game.setUpCollision = function ( vehicleYPos, carYPos, carXPos ) {
+			if ( game.currentVehicle.classList.contains( 'vehicle-left' )  ) {
+				console.log( 'entered-left' );
+				game.setUpLeftCollision( vehicleYPos, carYPos, carXPos );
+			} else if ( game.currentVehicle.classList.contains( 'vehicle-right' ) ) {
+				console.log( 'entered-right' );
+				game.setUpRightCollision( vehicleYPos, carYPos, carXPos )
+			}
+		};
+
+		/**
+		 * Create collision setting for Left Vehicles.
+		 *
+		 * @param {int} vehicleYPos Vehicle's Y position.
+		 * @param {int} carYPos  Car's Y Position.
+		 * @param {int} carXPos Car's X Position
+		 */
+		game.setUpLeftCollision = function ( vehicleYPos, carYPos, carXPos ) {
+
+			vehicleYPos = ( Math.round( game.currentVehicle.getBoundingClientRect().y ) );
+			carXPos = Math.round( game.carImage.getBoundingClientRect().x );
+			carYPos = Math.round( game.carImage.getBoundingClientRect().y ) - game.carImage.getBoundingClientRect().height + 10;
+
+			/* If the vehicle has not entered the play area then return. */
+			if ( 0 > vehicleYPos && game.innerHeight < vehicleYPos ) {
+				return;
+			}
+			if ( 80 > carXPos ) {
+				for ( var i = 0; i <= 5; i++ ) {
+					if ( vehicleYPos === carYPos ) {
+						console.log( 'collision' );
+						game.gameOver = true;
+					}
+					vehicleYPos++;
+					if ( true === game.gameOver ) {
+						game.gameOverSettings( 0 );
+						break;
+					}
+				}
+			}
+		};
+
+		/**
+		 * Create collision setting for Right Vehicles.
+		 *
+		 * @param {int} vehicleYPos Vehicle's Y position.
+		 * @param {int} carYPos  Car's Y Position.
+		 * @param {int} carXPos Car's X Position
+		 */
+		game.setUpRightCollision = function ( vehicleYPos, carYPos, carXPos ) {
+
+			vehicleYPos = ( Math.round( game.currentVehicle.getBoundingClientRect().y ) );
+			carXPos = Math.round( game.carImage.getBoundingClientRect().x );
+			carYPos = Math.round( game.carImage.getBoundingClientRect().y ) - game.carImage.getBoundingClientRect().height + 10;
+
+			/* If the vehicle has not entered the play area then return. */
+			if ( 0 > vehicleYPos && game.innerHeight < vehicleYPos ) {
+				return;
+			}
+
+			console.log( game.currentVehicle.getAttribute( 'class' ) );
+			console.log( game.currentVehicle.getBoundingClientRect() );
+			console.log( game.carImage.getBoundingClientRect() );
+			console.log( 'veh-pos= ' + vehicleYPos + ' car-pos= ' + carYPos + ' car-x= ' + carXPos );
+			console.log( 'entered-right-collision' );
+			if ( 180 < carXPos ) {
+				for ( var i = 0; i <= 5; i++ ) {
+					if ( vehicleYPos === carYPos ) {
+						console.log( 'collision' );
+						game.gameOver = true;
+					}
+					vehicleYPos++;
+					if ( true === game.gameOver ) {
+						game.gameOverSettings( 0 );
+						break;
+					}
 				}
 			}
 		};
@@ -535,31 +617,52 @@ var Game = ( function ( $ ) {
 		 * Inserts the vehicles on the left.
 		 */
 		game.insertLeftVehicle = function () {
-			game.createVehicleAndAddToDom( 'id-988', 'bike-red', 'bike-red.png' );
-			game.createVehicleAndAddToDom( 'id-970', 'bus-red', 'bus-red.png' );
+			game.createVehicleAndAddToDom( 'id-988', 'bike-red', 'bikes-red.png', 'vehicle-left' );
+			game.createVehicleAndAddToDom( 'id-970', 'bus-red', 'bus-red.png', 'vehicle-left' );
 		};
 
 		/**
 		 * Inserts the vehicles on the right.
 		 */
 		game.insertRightVehicle = function () {
-			game.createVehicleAndAddToDom( 'id-1980', 'car-audi', 'car-audi.png' );
+			game.createVehicleAndAddToDom( 'id-1980', 'car-audi', 'car-audi.png', 'vehicle-right' );
 		};
 
 		/**
 		 * Creates Vehicle image element based on give id and class name and appends it to the container div.
 		 *
 		 * @param {string} id ID for container div.
-		 * @param {string} uniqueClassName ClassName for Image.
+		 * @param {string} imageId ID for Image.
 		 * @param {string} imageName Image name
+		 * @param {string} classVal Class Name whether vehicle-left or vehicle-right.
 		 */
-		game.createVehicleAndAddToDom = function ( id, uniqueClassName, imageName ) {
+		game.createVehicleAndAddToDom = function ( id, imageId, imageName, classVal ) {
 			var divEl = document.getElementById( id ),
-				classes = 'vehicle-image ' + uniqueClassName,
+				className = 'vehicle-image ' + classVal,
 				srcValue = 'images/' + imageName,
-				vehicleImage = game.createElement( 'img', 'class', classes );
+				vehicleImage = game.createElement( 'img', 'class', className );
 			vehicleImage.setAttribute( 'src', srcValue );
+			vehicleImage.setAttribute( 'id', imageId );
 			divEl.appendChild( vehicleImage );
+		};
+
+		/**
+		 * Checks which vehicle is in the game area and sets its value to game.currentVehicle
+		 */
+		game.checkWhichVehicleIsInGameArea = function () {
+			game.allVehicles = document.querySelectorAll( '.vehicle-image' );
+			// console.log( game.allVehicles );
+			// console.log( game.allVehicles.length );
+			console.log( game.allVehicles[ 1 ].getBoundingClientRect().y );
+			var totalVehicleCount = game.allVehicles.length, vehicleYPos;
+			for ( var i = 0; i < totalVehicleCount; i++ ) {
+				vehicleYPos = ( Math.round( game.allVehicles[ i ].getBoundingClientRect().y ) );
+				if ( 0 < vehicleYPos && game.windowHeight > vehicleYPos ) {
+					game.currentVehicleId = game.allVehicles[ i ].getAttribute( 'id' );
+					game.currentVehicle = document.getElementById( game.currentVehicleId );
+					// game.gameOver = true;
+				}
+			}
 		};
 
 		/**
@@ -572,6 +675,7 @@ var Game = ( function ( $ ) {
 			if ( 0 <= pos ) {
 				game.gameOver = true;
 				game.carRunningSound.pause();
+				clearInterval( game.startRoadInterval );
 
 				if ( ! game.body.contains( game.gameOverImg ) ) {
 					game.body.appendChild( game.gameOverImg );
