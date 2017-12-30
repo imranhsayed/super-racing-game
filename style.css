@@ -68,16 +68,67 @@ body {
 	display: none;
 }
 
+/* Stage Button Images and Text */
+
+.stage-text-el {
+	letter-spacing: 1px;
+	padding: 0.50em;
+	color: #2c3035;
+	text-transform: uppercase;
+}
+
+.stage-container {
+	position: fixed;
+	margin: 0 auto;
+	text-align: center;
+	top: 10em;
+}
+
+.stage-container img {
+	width: 5em;
+	height: 5em;
+	padding: 0.50em;
+}
+
+.stage-border {
+	border: 2px solid #525463;
+}
+
 /*
- * 1.0.1 Main Road Box
+ * 1.0.0 Main Road Box
  */
 
 .road-box {
 	overflow: hidden;
 	position: absolute;
-	background: url("images/road-default.jpg") repeat-y;
 	background-size: 100%;
 	bottom: -700px;
+}
+
+.apply-stage-default-img {
+	background: url("images/road-default.jpg") repeat-y;
+	background-size: 100%;
+
+}
+
+.apply-stage-desert-img {
+	background: url("images/road-desert.png") repeat-y;
+	background-size: 100%;
+}
+
+.apply-stage-grass-img {
+	background: url("images/road-grass.jpg") repeat-y;
+	background-size: 100%;
+}
+
+.apply-stage-gray-img {
+	background: url("images/road-gray.jpg") repeat-y;
+	background-size: 100%;
+}
+
+.apply-stage-dirt-img {
+	background: url("images/road-dirty.jpg") repeat-y;
+	background-size: 100%;
 }
 
 .road-lines-left {
@@ -109,19 +160,21 @@ body {
 	display: none;
 }
 
+
 /* Game Start Button */
 .game-start-level-one {
-	position: absolute;
+	position: fixed;
 	padding: 3em;
 	color: #ffffff;
 	background-image: url("images/start-button.png");
 	background-size: 100%;
 	border-radius: 50%;
+	top: 2em;
 }
 
 /* Home Screen Car Image */
 .home-screen-car {
-	position: absolute;
+	position: fixed;
 	width: 13em;
 	top: 24em;
 }

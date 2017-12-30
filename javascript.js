@@ -35,6 +35,7 @@ var Game = ( function ( $ ) {
 		game.carRunningSound = document.getElementById( 'car-running-sound' );
 		game.breaksSound = document.getElementById( 'breaks-music' );
 		game.explosionSound = document.getElementById( 'explosion-sound' );
+		game.roadClass = 'apply-stage-default-img';
 		game.distance = 0;
 		game.divCount = 200;
 		game.counter = 0;
@@ -53,13 +54,31 @@ var Game = ( function ( $ ) {
 	 */
 	game.screenSetUp = function ( startBtnClassName, btnName, bodyBackgroundClass ) {
 		game.introMusic.play();
+		game.roadBoxDiv = game.createElement( 'div', 'class', 'road-box' );
 		game.createRoadBox();
 		game.createRoadLines( game.divCount );
+		game.roadBoxDiv.classList.add( game.roadClass );
 		game.startBttn = game.createElement( 'button', 'class', startBtnClassName );
+		game.stageContainer = game.createElement( 'div', 'class', 'stage-container' );
+		game.stageTextEl = game.createElement( 'p', 'class', 'stage-text-el' );
+		game.stageTextEl.textContent = 'Select Stage';
+		game.stageOneImgBtn = game.createImgElement( 'stage-default-img', 'road-default.jpg' );
+		game.stageTwoImgBtn = game.createImgElement( 'stage-desert-img', 'road-desert.png' );
+		game.stageThreeImgBtn = game.createImgElement( 'stage-grass-img', 'road-grass.jpg' );
+		game.stageFourImgBtn = game.createImgElement( 'stage-gray-img', 'road-gray.jpg' );
+		game.stageFiveImgBtn = game.createImgElement( 'stage-dirt-img', 'road-dirty.jpg' );
+		game.stageContainer.appendChild( game.stageTextEl );
+		game.stageContainer.appendChild( game.stageOneImgBtn );
+		game.stageContainer.appendChild( game.stageTwoImgBtn );
+		game.stageContainer.appendChild( game.stageThreeImgBtn );
+		game.stageContainer.appendChild( game.stageFourImgBtn );
+		game.stageContainer.appendChild( game.stageFiveImgBtn );
+		game.body.appendChild( game.stageContainer );
 		game.startBttn.textContent = btnName;
 		game.body.appendChild( game.startBttn );
 		game.body.appendChild( game.homeCarImg );
-		game.alignCenter( game.startBttn, true );
+		game.addRoadImgClass();
+		game.alignCenter( game.startBttn, false );
 		game.alignCenter( game.homeCarImg, false );
 		game.body.classList.add( bodyBackgroundClass );
 		game.startBttn.addEventListener( 'click', game.gameStart );
@@ -78,6 +97,25 @@ var Game = ( function ( $ ) {
 			}
 
 		} );
+	};
+
+	/**
+	 * Appends Road background to the dom by applying the class.
+	 */
+	game.addRoadImgClass = function () {
+		var allStageImgEls = game.stageContainer.querySelectorAll( 'img' );
+		for ( var i = 0; i < allStageImgEls.length; i++ ) {
+
+			allStageImgEls[ i ].addEventListener( 'click', function () {
+				game.roadClass = 'apply-' + this.getAttribute( 'class' );
+				for ( var j = 0; j < allStageImgEls.length; j++ ) {
+					allStageImgEls[ j ].classList.remove( 'stage-border' );
+				}
+				this.classList.add( 'stage-border' );
+				console.log( game.roadClass );
+				game.roadBoxDiv.classList.add( game.roadClass );
+			} );
+		}
 	};
 
 	/**
@@ -104,10 +142,12 @@ var Game = ( function ( $ ) {
 		game.introMusic.pause();
 		game.backgroundMusic.play();
 		game.body.classList.remove( 'home-screen-background' );
+		game.stageContainer.classList.add( 'display' );
 		game.body.removeChild( game.startBttn );
 		game.body.removeChild( game.homeCarImg );
 		game.carImage = game.createAndDisplayCar();
 		document.querySelector( '.road-box' ).style.display = 'block';
+
 		game.createGameInfoBox();
 		game.setRoadLineContainerLeft();
 		game.createAndDisplayMotionBtn();
@@ -167,7 +207,6 @@ var Game = ( function ( $ ) {
 	 *
 	 */
 	game.createRoadBox = function () {
-		game.roadBoxDiv = game.createElement( 'div', 'class', 'road-box' );
 		game.body.insertBefore( game.roadBoxDiv, game.hiddenElement );
 		game.roadBoxDiv.style.minWidth = game.windowWidth + 'px';
 		game.roadBoxDiv.style.minHeight = game.windowHeight + 'px';
