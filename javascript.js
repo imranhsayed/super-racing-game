@@ -25,9 +25,9 @@ var Game = ( function ( $ ) {
 		game.roadLineContainerLeft = game.createElement( 'div', 'class', 'road-line-container-left' );
 		game.roadLineContainerRight = game.createElement( 'div', 'class', 'road-line-container-right' );
 		game.gameOverImg = game.createImgElement( 'game-over-img', 'game-over.gif' );
+		game.stageCleared = game.createImgElement( 'stage-cleared', 'stage-cleared.png' );
 		game.restartBtnImg = game.createImgElement( 'restart-btn', 'restart-button.png' );
 		game.homeCarImg = game.createImgElement( 'home-screen-car', 'home-screen-car-img.png' );
-		game.homeDanceImg = game.createImgElement( 'man-dancing', 'man-dancing.gif' );
 		game.explosionImg = game.createImgElement( 'explosion-img', 'explosion.gif' );
 		game.introMusic = document.getElementById( 'intro-music' );
 		game.backgroundMusic = document.getElementById( 'background-music' );
@@ -57,10 +57,8 @@ var Game = ( function ( $ ) {
 		game.createRoadLines( game.divCount );
 		game.startBttn = game.createElement( 'button', 'class', startBtnClassName );
 		game.startBttn.textContent = btnName;
-		game.body.appendChild( game.homeDanceImg );
 		game.body.appendChild( game.startBttn );
 		game.body.appendChild( game.homeCarImg );
-		game.alignCenter( game.homeDanceImg, false );
 		game.alignCenter( game.startBttn, true );
 		game.alignCenter( game.homeCarImg, false );
 		game.body.classList.add( bodyBackgroundClass );
@@ -108,7 +106,6 @@ var Game = ( function ( $ ) {
 		game.body.classList.remove( 'home-screen-background' );
 		game.body.removeChild( game.startBttn );
 		game.body.removeChild( game.homeCarImg );
-		game.body.removeChild( game.homeDanceImg );
 		game.carImage = game.createAndDisplayCar();
 		document.querySelector( '.road-box' ).style.display = 'block';
 		game.createGameInfoBox();
@@ -427,7 +424,7 @@ var Game = ( function ( $ ) {
 					for ( var i = 0; i <= 5; i++ ) {
 						if ( vehicleYPos === carYPos ) {
 							game.collision = true;
-							game.gameOverSettings( 0, true );
+							game.gameOverSettings( 0, true, false );
 							break;
 						}
 						vehicleYPos++;
@@ -457,7 +454,7 @@ var Game = ( function ( $ ) {
 					for ( var i = 0; i <= 5; i++ ) {
 						if ( vehicleYPos === carYPos ) {
 							game.collision = true;
-							game.gameOverSettings( 0, true );
+							game.gameOverSettings( 0, true, false );
 							break;
 						}
 						vehicleYPos++;
@@ -519,7 +516,7 @@ var Game = ( function ( $ ) {
 				pos = ( endPos > pos ) ? pos + speed : pos - speed;
 				element.style.top = pos + unit;
 				game.calculateDistance( pos );
-				game.gameOverSettings( pos, false );
+				game.gameOverSettings( pos, false, true );
 				game.checkWhichVehicleIsInGameArea();
 				game.setUpCollision( vehicleYPos, carYPos, carXPos );
 			}
@@ -590,7 +587,7 @@ var Game = ( function ( $ ) {
 			for ( var i = 0; i <= 5; i++ ) {
 				if ( vehicleYPos === carYPos ) {
 					game.collision = true;
-					game.gameOverSettings( 0, true );
+					game.gameOverSettings( 0, true, false );
 					break;
 				}
 				vehicleYPos++;
@@ -620,7 +617,7 @@ var Game = ( function ( $ ) {
 			for ( var i = 0; i <= 5; i++ ) {
 				if ( vehicleYPos === carYPos ) {
 					game.collision = true;
-					game.gameOverSettings( 0, true );
+					game.gameOverSettings( 0, true, false );
 					break;
 				}
 				vehicleYPos++;
@@ -686,6 +683,12 @@ var Game = ( function ( $ ) {
 	game.insertLeftVehicle = function () {
 		game.createVehicleAndAddToDom( 'id-188', 'bike-red', 'bikes-red.png', 'vehicle-left' );
 		game.createVehicleAndAddToDom( 'id-170', 'bus-red', 'bus-red.png', 'vehicle-left' );
+		game.createVehicleAndAddToDom( 'id-140', 'barricade-no-entry', 'barricade-noentry.png', 'vehicle-left' );
+		game.createVehicleAndAddToDom( 'id-110', 'car-audi-left', 'car-audi.png', 'vehicle-left' );
+		game.createVehicleAndAddToDom( 'id-100', 'caution', 'caution.gif', 'vehicle-left' );
+		game.createVehicleAndAddToDom( 'id-70', 'car-gray', 'car-gray.png', 'vehicle-left' );
+		game.createVehicleAndAddToDom( 'id-40', 'fire-left', 'fire.gif', 'vehicle-left' );
+		game.createVehicleAndAddToDom( 'id-15', 'fire-left-two', 'fire.gif', 'vehicle-left' );
 	};
 
 	/**
@@ -693,6 +696,12 @@ var Game = ( function ( $ ) {
 	 */
 	game.insertRightVehicle = function () {
 		game.createVehicleAndAddToDom( 'id-380', 'car-audi', 'car-audi.png', 'vehicle-right' );
+		game.createVehicleAndAddToDom( 'id-350', 'car-police', 'car-police.png', 'vehicle-right' );
+		game.createVehicleAndAddToDom( 'id-320', 'car-red', 'car-red.png', 'vehicle-right' );
+		game.createVehicleAndAddToDom( 'id-280', 'man-drilling', 'man-drilling.gif', 'vehicle-right' );
+		game.createVehicleAndAddToDom( 'id-250', 'fire-right', 'fire.gif', 'vehicle-right' );
+		game.createVehicleAndAddToDom( 'id-230', 'car-orange', 'car-orange.png', 'vehicle-right' );
+		game.createVehicleAndAddToDom( 'id-220', 'car-taxi', 'car-taxi.png', 'vehicle-right' );
 	};
 
 	/**
@@ -736,23 +745,27 @@ var Game = ( function ( $ ) {
 	 *
 	 * @param {int} pos Current position.
 	 * @param {bool} collision If collision has happened then pass collision value as true, false otherwise.
+	 * @param {bool} missionCompleted If mission is completed pass the value as true, false otherwise.
 	 */
-	game.gameOverSettings = function ( pos, collision ) {
+	game.gameOverSettings = function ( pos, collision, missionCompleted ) {
 		if ( 0 <= pos ) {
 			if ( collision ) {
 				game.actionsOnCollision();
+			}
+			if ( false === missionCompleted && ! game.body.contains( game.gameOverImg ) ) {
+				game.body.appendChild( game.gameOverImg );
+			} else {
+				game.body.appendChild( game.stageCleared );
 			}
 			game.gameOver = true;
 			game.carRunningSound.pause();
 			clearInterval( game.startRoadInterval );
 
-			if ( ! game.body.contains( game.gameOverImg ) ) {
-				game.body.appendChild( game.gameOverImg );
-				game.body.appendChild( game.restartBtnImg );
-				game.restartBtnImg.addEventListener( 'click', function () {
-					location.reload();
-				} );
-			}
+			game.body.appendChild( game.restartBtnImg );
+			game.restartBtnImg.addEventListener( 'click', function () {
+				location.reload();
+			} );
+
 
 		}
 	};

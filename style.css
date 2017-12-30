@@ -75,7 +75,7 @@ body {
 .road-box {
 	overflow: hidden;
 	position: absolute;
-	background: url("images/road.jpg") repeat-y;
+	background: url("images/road-default.jpg") repeat-y;
 	background-size: 100%;
 	bottom: -700px;
 }
@@ -165,19 +165,17 @@ body {
 .gear-control-container {
 	display: inline;
 	position: fixed;
-	right: 3%;
-	bottom: 4%;
+	right: 9em;
+	bottom: 1.2em;
 }
 
 .gear-control-container img {
 	display: block;
 	width: 3.5em;
-	text-align: center;
-	margin: 0 auto;
 }
 
 .gear-down-arrow {
-	margin-left: 0.10em;
+	margin-left: 0.2em;
 }
 
 .gear-control-container .left-direction-button, .gear-control-container .right-direction-button {
@@ -185,9 +183,33 @@ body {
 	width: 2em;
 }
 
+.gear-control-container .left-direction-button,
+.gear-control-container .right-direction-button {
+	width: 3em;
+}
+
+.gear-control-container .gear-up-arrow,
+.gear-control-container .gear-down-arrow {
+	width: 4em;
+}
+
+.left-direction-button {
+	position: fixed;
+	width: 1.5em;
+	bottom: 3em;
+	left: 1em;
+}
+
+.right-direction-button {
+	position: fixed;
+	width: 1.5em;
+	bottom: 3em;
+	right: 1em;
+}
+
 .gear-control-container .stop-acceleration-img {
 	display: inline;
-	margin: 0.25em;
+	margin: 0.50em 0.50em 0.25em 0.25em;
 }
 
 .clear {
@@ -217,14 +239,33 @@ body {
 	width: 3.7em;
 }
 
+#barricade-no-entry {
+	width: 7em;
+}
+
+#man-drilling {
+	width: 5em;
+}
+
+#caution {
+	width: 6em;
+}
+
+#fire-left, #fire-right, #fire-left-two {
+	width: 8em;
+}
 
 /* Game Over Image */
-.game-over-img {
+.game-over-img, .stage-cleared {
 	width: 11em;
 	position: fixed;
 	text-align: center;
 	left: 27%;
 	top: 10%;
+}
+
+.stage-cleared {
+	top: 14%;
 }
 
 .restart-btn {
