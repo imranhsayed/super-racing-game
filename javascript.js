@@ -108,6 +108,7 @@ var Game = ( function ( $ ) {
 	game.addRoadImgClass = function () {
 		var allStageImgEls = game.stageContainer.querySelectorAll( 'img' );
 		game.createAndDisplayCar();
+		game.carImage.classList.add( 'car-display-none' );
 
 		for ( var i = 0; i < allStageImgEls.length; i++ ) {
 
@@ -121,13 +122,14 @@ var Game = ( function ( $ ) {
 				game.roadBoxDiv.classList.add( game.roadClass );
 				if ( 'apply-stage-desert-img' === game.roadClass ) {
 					game.currentBackgroundMusicEl = game.backgroundMusicTwo;
-					game.carImage.setAttribute( 'src', 'images/car-first-stage.png' );
+					game.carImage.setAttribute( 'src', 'images/car-second-stage.png' );
 				}
 				if ( 'apply-stage-grass-img' === game.roadClass ) {
 					game.currentBackgroundMusicEl = game.backgroundMusicThree;
 				}
 				if ( 'apply-stage-gray-img' === game.roadClass ) {
 					game.currentBackgroundMusicEl = game.backgroundMusicTwo;
+					game.carImage.setAttribute( 'src', 'images/car-fourth-stage.png' );
 				}
 			} );
 		}
@@ -158,10 +160,12 @@ var Game = ( function ( $ ) {
 		game.currentBackgroundMusicEl.play();
 		game.body.classList.remove( 'home-screen-background' );
 		game.stageContainer.classList.add( 'display' );
+		game.carImage.classList.remove( 'car-display-none' );
+		game.carImage.classList.add( 'car-display-block' );
 		game.body.removeChild( game.startBttn );
 		game.body.removeChild( game.homeCarImg );
 		document.querySelector( '.road-box' ).style.display = 'block';
-
+		game.carImage.classList.remove( 'display' );
 		game.createGameInfoBox();
 		game.setRoadLineContainerLeft();
 		game.createAndDisplayMotionBtn();
@@ -194,7 +198,6 @@ var Game = ( function ( $ ) {
 	 * @param {string} attrName The Attribute name to be created.
 	 * @param {string} attrVal The Attribute value to be created.
 	 * @return {string} createdElement Created Element with the given attributes and attributes values.
-	 *
 	 */
 	game.createElement = function ( elementType, attrName, attrVal ) {
 		var createdElement = document.createElement( elementType );
@@ -293,7 +296,7 @@ var Game = ( function ( $ ) {
 	 */
 	game.createAndDisplayCar = function () {
 
-		game.carImage = game.createElement( 'img', 'class', 'car-img' );
+		game.carImage = game.createElement( 'img', 'class', 'car' );
 		game.carImage.setAttribute( 'src', 'images/car-first-stage.png' );
 		game.body.appendChild( game.carImage );
 	};

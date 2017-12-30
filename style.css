@@ -64,6 +64,7 @@ body {
 	position: relative;
 }
 
+
 .display {
 	display: none;
 }
@@ -192,7 +193,7 @@ body {
 }
 
 /* Car Image */
-.car-img {
+.car-display-block {
 	position: fixed;
 	bottom: 15%;
 	left: 18%;
@@ -200,6 +201,9 @@ body {
 	display: inline-block;
 }
 
+.car-display-none {
+	display: none;
+}
 
 /* Motion controls Stop button, Gear Button, Gear Up, Gear Down, Direction Up, Direction Down Arrow Keys */
 
