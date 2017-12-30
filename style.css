@@ -30,6 +30,7 @@ footer, header, hgroup, menu, nav, section {
 }
 body {
 	line-height: 1;
+	font-family: 'Roboto', sans-serif;
 }
 ol, ul {
 	list-style: none;
@@ -72,27 +73,50 @@ body {
 /* Stage Button Images and Text */
 
 .stage-text-el {
-	letter-spacing: 1px;
-	padding: 0.50em;
-	color: #2c3035;
+	font-size: 1.3em;
+	padding: 0.30em;
+	color: #444349;
 	text-transform: uppercase;
+	font-style: italic;
+	background: -webkit-linear-gradient(#00e2ff, #008eff);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	margin-bottom: 1.3em;
 }
 
 .stage-container {
 	position: fixed;
 	margin: 0 auto;
 	text-align: center;
-	top: 10em;
+	top: 8em;
+	width: 100%;
+	background: #383838;
 }
 
 .stage-container img {
-	width: 5em;
-	height: 5em;
-	padding: 0.50em;
+	width: 3.5em;
+	height: 7em;
+	margin-right: 0.50em;
+}
+
+.stage-container img:last-child {
+	margin-right: 0;
 }
 
 .stage-border {
-	border: 2px solid #525463;
+	border: 2px solid #ffffff;
+}
+
+.game-name-el {
+	background: #ffc107f0;
+	padding: 0.75em;
+	margin-bottom: 0.5em;
+	font-size: 1.2em;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+	color: #383838;
+	font-weight: 800;
+	font-style: italic;
 }
 
 /*
@@ -133,13 +157,11 @@ body {
 }
 
 .road-lines-left {
-	/*background: red;*/
 	margin-top: 20%;
 	text-align: center;
 }
 
 .road-lines-right {
-	/*background: blue;*/
 	margin-top: 20%;
 	text-align: center;
 
@@ -189,7 +211,7 @@ body {
 
 /* Home Screen Background */
 .home-screen-background {
-	background: cornsilk;
+	background: #383838;
 }
 
 /* Car Image */

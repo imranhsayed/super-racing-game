@@ -63,6 +63,8 @@ var Game = ( function ( $ ) {
 		game.roadBoxDiv.classList.add( game.roadClass );
 		game.startBttn = game.createElement( 'button', 'class', startBtnClassName );
 		game.stageContainer = game.createElement( 'div', 'class', 'stage-container' );
+		game.gameNameEl = game.createElement( 'p', 'class', 'game-name-el' );
+		game.gameNameEl.textContent = 'Super Racing Game';
 		game.stageTextEl = game.createElement( 'p', 'class', 'stage-text-el' );
 		game.stageTextEl.textContent = 'Select Stage';
 		game.stageOneImgBtn = game.createImgElement( 'stage-default-img', 'road-default.jpg' );
@@ -70,6 +72,7 @@ var Game = ( function ( $ ) {
 		game.stageThreeImgBtn = game.createImgElement( 'stage-grass-img', 'road-grass.jpg' );
 		game.stageFourImgBtn = game.createImgElement( 'stage-gray-img', 'road-gray.jpg' );
 		game.stageFiveImgBtn = game.createImgElement( 'stage-dirt-img', 'road-dirty.jpg' );
+		game.stageContainer.appendChild( game.gameNameEl );
 		game.stageContainer.appendChild( game.stageTextEl );
 		game.stageContainer.appendChild( game.stageOneImgBtn );
 		game.stageContainer.appendChild( game.stageTwoImgBtn );
@@ -118,7 +121,6 @@ var Game = ( function ( $ ) {
 					allStageImgEls[ j ].classList.remove( 'stage-border' );
 				}
 				this.classList.add( 'stage-border' );
-				console.log( game.roadClass );
 				game.roadBoxDiv.classList.add( game.roadClass );
 				if ( 'apply-stage-desert-img' === game.roadClass ) {
 					game.currentBackgroundMusicEl = game.backgroundMusicTwo;
@@ -232,9 +234,6 @@ var Game = ( function ( $ ) {
 		game.roadLineContainerLeft.style.minHeight = ( game.windowHeight ) + 'px';
 		game.roadLineContainerRight.style.minWidth = ( game.windowWidth / 2 ) + 'px';
 		game.roadLineContainerRight.style.minHeight = ( game.windowHeight ) + 'px';
-
-		console.log( game.windowWidth );
-		console.log( game.windowHeight );
 	};
 
 	/**
