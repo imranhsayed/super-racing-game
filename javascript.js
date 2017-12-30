@@ -31,6 +31,9 @@ var Game = ( function ( $ ) {
 		game.explosionImg = game.createImgElement( 'explosion-img', 'explosion.gif' );
 		game.introMusic = document.getElementById( 'intro-music' );
 		game.backgroundMusic = document.getElementById( 'background-music' );
+		game.backgroundMusicTwo = document.getElementById( 'background-music-two' );
+		game.backgroundMusicThree = document.getElementById( 'background-music-three' );
+		game.currentBackgroundMusicEl = game.backgroundMusic;
 		game.carStartUpSound = document.getElementById( 'car-start-up-sound' );
 		game.carRunningSound = document.getElementById( 'car-running-sound' );
 		game.breaksSound = document.getElementById( 'breaks-music' );
@@ -104,6 +107,8 @@ var Game = ( function ( $ ) {
 	 */
 	game.addRoadImgClass = function () {
 		var allStageImgEls = game.stageContainer.querySelectorAll( 'img' );
+		game.createAndDisplayCar();
+
 		for ( var i = 0; i < allStageImgEls.length; i++ ) {
 
 			allStageImgEls[ i ].addEventListener( 'click', function () {
@@ -114,6 +119,16 @@ var Game = ( function ( $ ) {
 				this.classList.add( 'stage-border' );
 				console.log( game.roadClass );
 				game.roadBoxDiv.classList.add( game.roadClass );
+				if ( 'apply-stage-desert-img' === game.roadClass ) {
+					game.currentBackgroundMusicEl = game.backgroundMusicTwo;
+					game.carImage.setAttribute( 'src', 'images/car-first-stage.png' );
+				}
+				if ( 'apply-stage-grass-img' === game.roadClass ) {
+					game.currentBackgroundMusicEl = game.backgroundMusicThree;
+				}
+				if ( 'apply-stage-gray-img' === game.roadClass ) {
+					game.currentBackgroundMusicEl = game.backgroundMusicTwo;
+				}
 			} );
 		}
 	};
@@ -140,12 +155,11 @@ var Game = ( function ( $ ) {
 	 */
 	game.gameStart = function () {
 		game.introMusic.pause();
-		game.backgroundMusic.play();
+		game.currentBackgroundMusicEl.play();
 		game.body.classList.remove( 'home-screen-background' );
 		game.stageContainer.classList.add( 'display' );
 		game.body.removeChild( game.startBttn );
 		game.body.removeChild( game.homeCarImg );
-		game.carImage = game.createAndDisplayCar();
 		document.querySelector( '.road-box' ).style.display = 'block';
 
 		game.createGameInfoBox();
@@ -276,13 +290,12 @@ var Game = ( function ( $ ) {
 	/**
 	 * Create and display car image.
 	 *
-	 * @return {string} carImage car Image element.
 	 */
 	game.createAndDisplayCar = function () {
+
 		game.carImage = game.createElement( 'img', 'class', 'car-img' );
-		game.carImage.setAttribute( 'src', 'images/car-forward.png' );
+		game.carImage.setAttribute( 'src', 'images/car-first-stage.png' );
 		game.body.appendChild( game.carImage );
-		return game.carImage;
 	};
 
 	/**
@@ -425,7 +438,7 @@ var Game = ( function ( $ ) {
 		}
 		game.carLeftPos = parseFloat( window.getComputedStyle( game.carImage ).left );
 		game.currentPos = Math.round( ( game.carLeftPos / game.windowWidth ) * 100 );
-		game.animate( game.carImage, 5, game.currentPos, 12, '%', 'left' );
+		game.animate( game.carImage, 5, game.currentPos, 18, '%', 'left' );
 		game.collideFromLeft();
 	};
 
@@ -438,7 +451,7 @@ var Game = ( function ( $ ) {
 		}
 		game.carLeftPos = parseFloat( window.getComputedStyle( game.carImage ).left );
 		game.currentPos = Math.round( ( game.carLeftPos / game.windowWidth ) * 100 );
-		game.animate( game.carImage, 5, game.currentPos, 57, '%', 'left' );
+		game.animate( game.carImage, 5, game.currentPos, 60, '%', 'left' );
 		game.leftDirectionBtn.addEventListener( 'click', game.moveCarLeft );
 		game.collideFromRight();
 	};
